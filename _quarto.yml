@@ -1,0 +1,83 @@
+project:
+  title: "Élasticité linéaire"
+  output-dir: public
+
+lang: fr
+
+execute:
+  echo: true
+  warning: false
+  freeze: false
+
+format:
+  html:
+    output-file: index.html
+    default-image-extension: svg
+    theme:
+      light: [cosmo, ensta-light.scss]
+      dark: [darkly, ensta-dark.scss]
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    toc-title: "Sommaire"
+    number-sections: true
+    number-depth: 3
+    html-math-method: mathjax
+    code-fold: true
+    code-summary: "Afficher le code Python"
+    code-tools: true
+    smooth-scroll: true
+    anchor-sections: true
+    crossrefs-hover: true
+    embed-resources: false
+    css: ensta.css
+    fig-align: center
+    include-after-body:
+      text: |
+        <script>
+        // Le PDF (« Autres formats ») s'ouvre dans un nouvel onglet
+        document.querySelectorAll('a[href$=".pdf"]').forEach(function (a) {
+          a.removeAttribute("download"); a.target = "_blank"; a.rel = "noopener";
+        });
+        </script>
+  pdf:
+    output-file: elasticite_seance1.pdf
+    default-image-extension: pdf
+    documentclass: scrartcl
+    papersize: a4
+    geometry:
+      - margin=2.2cm
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    echo: false
+    fig-dpi: 200
+    fig-width: 7
+    fig-height: 4
+    include-in-header:
+      text: |
+        \usepackage{amsmath,amssymb}
+        \usepackage{xcolor}
+        \definecolor{enstableu}{HTML}{3746FF}
+        \definecolor{enstanuit}{HTML}{190F3C}
+        \definecolor{enstacorail}{HTML}{FF808B}
+        \AtBeginDocument{\hypersetup{linkcolor=enstableu,urlcolor=enstableu,citecolor=enstableu,filecolor=enstableu}}
+        \addtokomafont{disposition}{\color{enstanuit}}
+        \addtokomafont{title}{\color{enstanuit}}
+        \addtokomafont{subtitle}{\color{enstableu}}
+        % Encadrés (callouts) aux couleurs ENSTA, une couleur par type
+        \definecolor{enstableuclair}{HTML}{9BA3FF}
+        \definecolor{enstacorailfonce}{HTML}{D6455A}
+        \AtBeginDocument{%
+          \definecolor{quarto-callout-note-color}{HTML}{3746FF}%
+          \definecolor{quarto-callout-note-color-frame}{HTML}{3746FF}%
+          \definecolor{quarto-callout-tip-color}{HTML}{FF808B}%
+          \definecolor{quarto-callout-tip-color-frame}{HTML}{FF808B}%
+          \definecolor{quarto-callout-important-color}{HTML}{190F3C}%
+          \definecolor{quarto-callout-important-color-frame}{HTML}{190F3C}%
+          \definecolor{quarto-callout-warning-color}{HTML}{D6455A}%
+          \definecolor{quarto-callout-warning-color-frame}{HTML}{D6455A}%
+          \definecolor{quarto-callout-caution-color}{HTML}{9BA3FF}%
+          \definecolor{quarto-callout-caution-color-frame}{HTML}{9BA3FF}%
+        }

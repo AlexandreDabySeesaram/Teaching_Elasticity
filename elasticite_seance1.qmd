@@ -1,0 +1,1132 @@
+---
+title: "Élasticité linéaire — Séance 1"
+subtitle: "Loi de comportement, élasticité linéaire isotrope et thermoélasticité"
+date: 2026-10-22
+date-format: "D MMMM YYYY"
+jupyter: python3
+---
+
+\newcommand{\vv}[1]{\underline{#1}}
+\newcommand{\tsd}[1]{\underline{\underline{#1}}}
+\newcommand{\tsq}[1]{\underline{\underline{\underline{\underline{#1}}}}}
+\newcommand{\Id}{\tsd{\mathbf{1}}}
+\newcommand{\eps}{\tsd{\varepsilon}}
+\newcommand{\sig}{\tsd{\sigma}}
+\newcommand{\Cel}{\tsq{C}}
+\newcommand{\Sel}{\tsq{S}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\dive}{\operatorname{div}}
+\newcommand{\grad}{\operatorname{grad}}
+\newcommand{\T}{{}^{t}}
+\newcommand{\wel}{w_{\text{élas}}}
+
+```{python}
+#| label: setup
+#| echo: false
+# Affichage des figures Plotly, valable pour toutes les sorties.
+# Chaque figure est émise avec plusieurs représentations, et Quarto choisit
+# celle qui convient au format en cours de rendu :
+# - HTML : la figure interactive (text/html, plotly.js intégré à la page
+#   avec la première figure) ;
+# - PDF  : la figure vectorielle (application/pdf, via `kaleido`).
+# On ne cherche donc pas à deviner le format de sortie (Quarto peut
+# réutiliser le même noyau Python pour le HTML puis le PDF).
+import base64
+
+import numpy as np
+import plotly.graph_objects as go
+import plotly.io as pio
+from IPython.display import display
+
+try:
+    # kaleido 0.2.x : évite le cadre « Loading MathJax » sur la 1re figure
+    pio.kaleido.scope.mathjax = None
+except Exception:
+    pass
+
+if not hasattr(go.Figure, "_show_origine"):
+    go.Figure._show_origine = go.Figure.show
+
+def _show_multi(self, *args, **kwargs):
+    html = self.to_html(full_html=False, include_plotlyjs=False,
+                        config={"responsive": True, "displaylogo": False})
+    sorties = {"text/html": html}
+    try:
+        pdf = self.to_image(format="pdf", width=900,
+                            height=self.layout.height or 450)
+        sorties["application/pdf"] = base64.b64encode(pdf).decode()
+    except Exception:
+        # Sans kaleido : une note remplace la figure dans le PDF
+        sorties["text/markdown"] = "*Figure interactive disponible dans la version HTML.*"
+    display(sorties, raw=True)
+
+go.Figure.show = _show_multi
+
+# plotly.js est chargé une seule fois ici, en tête de page (HTML seulement),
+# plutôt qu'avec la première figure : Quarto 1.9 remonte en haut de la page
+# la sortie qui contient la bibliothèque, figure comprise.
+# Quarto peut aussi ajouter require.js à la page : plotly.js s'enregistrerait
+# alors comme module AMD et `Plotly` resterait indéfini (figures vides).
+# On masque donc `define` le temps de charger plotly.js.
+from plotly.offline import get_plotlyjs
+display({"text/html": "<script>window.__define_sauve = window.define; window.define = undefined;</script>"
+                      "<script type=\"text/javascript\">" + get_plotlyjs() + "</script>"
+                      "<script>window.define = window.__define_sauve;</script>"},
+        raw=True)
+
+pio.templates.default = "plotly_white"
+# Charte graphique ENSTA : bleu ENSTA, corail, bleu nuit, bleu ENSTA clair
+COULEURS = ["#3746ff", "#ff808b", "#190f3c", "#9ba2ff"]
+```
+
+# Rappels de mécanique des milieux continus {#sec-rappels}
+
+Cette séance s'appuie sur ce que l'on sait du cours de mécanique des milieux continus (MMC). On rappelle ici les objets essentiels, dans l'hypothèse des petites perturbations qui sera celle de tout le cours.
+
+## Notations
+
+::: {.callout-note}
+## Pour info : changement de notation
+
+Dans ce cours, les vecteurs sont soulignés une fois et les tenseurs d'ordre 2 deux fois (les tenseurs d'ordre 4 quatre fois), au lieu des flèches utilisées en MMC :
+
+$$
+\vec{u} \to \vv{u}, \qquad \vec{a} \to \vv{M}, \qquad
+\vec{\vec{F}} \to \tsd{F}, \qquad
+\vec{\vec{\varepsilon}} \to \eps, \qquad
+\vec{\vec{\sigma}} \to \sig .
+$$
+:::
+
+## Cinématique d'un solide déformable {#sec-cinematique}
+
+On sait décrire la cinématique d'un solide qui se déforme via :
+
+- **la transformation** $\vv{x} = \vv{\varphi}(\vv{X})$, qui associe à la position initiale $\vv{X}$ d'un point matériel sa position actuelle $\vv{x}$ ;
+- **son gradient** $\tsd{F} = \tsd{\nabla} \vv{\varphi} = \Id + \tsd{\nabla} \vv{u}$, où $\vv{u}$ est le champ de déplacement ;
+- **le tenseur des déformations** de Green–Lagrange
+$$
+\tsd{E} = \frac{1}{2}\left(\T\tsd{F}\,\tsd{F} - \Id\right).
+$$ {#eq-green-lagrange}
+
+## Hypothèse des petites perturbations (HPP) {#sec-hpp}
+
+::: {.callout-warning}
+## Hypothèse des petites perturbations
+
+C'est le cadre dans lequel on se place pour **tout ce cours** : $\|\vv{u}\| \ll 1$ (rapporté à une longueur caractéristique) et $\|\tsd{\nabla} \vv{u}\| \ll 1$.
+:::
+
+### Déformation linéarisée
+
+En développant @eq-green-lagrange avec $\tsd{F} = \Id + \tsd{\nabla}\vv{u}$ :
+$$
+\tsd{E} = \frac{1}{2}\left(\T\tsd{F}\,\tsd{F} - \Id\right)
+= \frac{1}{2}\Big(\underbrace{\tsd{\nabla} \vv{u} + \T\tsd{\nabla} \vv{u}}_{\text{linéaire}}
++ \underbrace{\T\tsd{\nabla} \vv{u}\,\tsd{\nabla} \vv{u}}_{\text{non linéaire}}\Big).
+$$
+
+En HPP, $\|\tsd{\nabla} \vv{u}\| \ll 1$, donc $\T\tsd{\nabla}\vv{u}\,\tsd{\nabla}\vv{u} \simeq \tsd{0}$ et on obtient le **tenseur des déformations linéarisé** $\eps$, tel que
+$$
+\tsd{E} \simeq \eps = \frac{1}{2}\left(\tsd{\nabla} \vv{u} + \T\tsd{\nabla} \vv{u}\right) = \tsd{\nabla}_{\text{sym}}\vv{u}.
+$$ {#eq-eps-lin}
+
+::: {.callout-warning}
+## Attention
+
+On a bien rappelé cela et le fait que $\eps$ n'est vrai qu'en HPP (cf. cours de MMC).
+:::
+
+### Interprétation : allongement relatif {#sec-allongement}
+
+Un petit segment matériel $d\vv{X} = \ell_0\,\vv{e}_i$ est transporté en $d\vv{x} = \tsd{F}\,d\vv{X}$. Sa longueur actuelle vaut
+$$
+\|d\vv{x}\| = \sqrt{d\vv{x}\cdot d\vv{x}} = \sqrt{\tsd{F}\,d\vv{X}\cdot\tsd{F}\,d\vv{X}}
+= \ell_0\sqrt{\tsd{F}\vv{e}_i\cdot\tsd{F}\vv{e}_i},
+\qquad\text{avec}\quad
+\tsd{F}\vv{e}_i\cdot\tsd{F}\vv{e}_i = \T(\tsd{F}\vv{e}_i)(\tsd{F}\vv{e}_i) = \T\vv{e}_i\,\T\tsd{F}\tsd{F}\,\vv{e}_i .
+$$
+
+D'où l'**allongement relatif**, en utilisant $\T\tsd{F}\tsd{F} = 2\tsd{E} + \Id \simeq 2\eps + \Id$ :
+$$
+\frac{\|d\vv{x}\| - \|d\vv{X}\|}{\|d\vv{X}\|}
+= \sqrt{\T\vv{e}_i\,\T\tsd{F}\tsd{F}\,\vv{e}_i} - 1
+= \sqrt{1 + 2\varepsilon_{ii}} - 1 \simeq \varepsilon_{ii}.
+$$
+
+Donc $\varepsilon_{ii}$ (sans sommation) **mesure l'allongement relatif dans la direction $\vv{e}_i$**.
+
+### Mesure de la variation de volume {#sec-volume}
+
+En HPP,
+$$
+\det\tsd{F} = \det\begin{pmatrix}
+1+u_{1,1} & u_{1,2} & u_{1,3}\\
+\vdots & 1+u_{2,2} & u_{2,3}\\
+\cdots & \cdots & 1+u_{3,3}
+\end{pmatrix}
+\simeq (1+u_{1,1})(1+u_{2,2})(1+u_{3,3})
+\simeq 1 + u_{1,1} + u_{2,2} + u_{3,3},
+$$
+en enlevant à chaque étape les termes d'ordre élevé (qui font intervenir des produits $\sim u^2$). Ainsi
+$$
+\det\tsd{F} \simeq 1 + \tr(\tsd{\nabla}\vv{u}) = 1 + \tr\big(\eps(\vv{u})\big).
+$$
+
+D'où $dV \simeq \big(1 + \tr\eps\big)\,dV_0$, soit
+$$
+\frac{dV - dV_0}{dV_0} = \tr\eps ,
+$$ {#eq-dilatation}
+qui **mesure la déformation volumique**.
+
+## Contraintes {#sec-contraintes}
+
+On a également introduit un objet décrivant les efforts à l'intérieur de la matière : le **tenseur des contraintes de Cauchy** $\sig$.
+
+Si l'on coupe le solide $\Omega$ en deux parties $\Omega^-$ et $\Omega^+$, les efforts surfaciques exercés par $\Omega^-$ sur $\Omega^+$ à travers un élément de surface $dS$ de normale $\vv{n}$ sont donnés par le **vecteur contrainte** (@fig-contraintes)
+$$
+\vv{T} = \sig\,\vv{n}.
+$$
+
+![Coupure du solide $\Omega$ en deux parties : à travers l'élément de surface $dS$ de normale $\vv{n}$ (sortante de $\Omega^+$), $\Omega^-$ exerce sur $\Omega^+$ l'effort surfacique $\vv{T} = \sig\,\vv{n}$.](schema_contraintes){#fig-contraintes width=60%}
+
+L'**équilibre** (principe fondamental de la dynamique) donne
+$$
+\dive\sig + \vv{f}_v = \rho\,\vv{\gamma} \quad\text{dans } \Omega,
+\qquad
+\sig = \T\sig \quad\text{dans } \Omega .
+$$ {#eq-pfd}
+
+::: {.callout-note}
+## Remarque : d'où vient l'équation locale ?
+
+On part de ce que l'on connaît : le PFD, $\sum \vv{F} = m\,\vv{\gamma}$, écrit pour un sous-domaine **quelconque** $D \subset \Omega$ :
+$$
+\underbrace{\int_D \vv{f}_v\,dV}_{\text{efforts volumiques}}
++ \underbrace{\int_{\partial D} \vv{T}\,dS}_{\text{efforts surfaciques}}
+= \int_D \rho\,\vv{\gamma}\,dV .
+$$
+Les efforts surfaciques se réécrivent avec $\sig$, puisque $\vv{T} = \sig\,\vv{n}$, puis avec le **théorème de la divergence** :
+$$
+\int_{\partial D} \sig\,\vv{n}\,dS = \int_D \dive\sig\,dV .
+$$
+On obtient donc
+$$
+\int_D \left(\dive\sig + \vv{f}_v - \rho\,\vv{\gamma}\right) dV = \vv{0}
+\qquad \text{pour tout } D \subset \Omega .
+$$
+Comme cette égalité est vraie pour n'importe quel volume $D$, aussi petit soit-il, l'intégrande est nul en tout point : c'est l'équation locale (@eq-pfd). (La symétrie $\sig = \T\sig$ s'obtient de la même façon à partir de l'équilibre des moments.)
+:::
+
+Les **conditions aux limites** sont de deux types :
+
+- en **déplacement** (Dirichlet) : $\vv{u}(\vv{M}) = \vv{u}_d \quad \forall \vv{M}\in\partial\Omega_u$ ;
+- en **effort** (Neumann) : $\vv{T}(\vv{M}) = \vv{F}_d \quad \forall \vv{M}\in\partial\Omega_f$.
+
+## Bilan de ce que l'on sait {#sec-bilan}
+
+Résoudre un problème de mécanique des milieux continus solides signifie trouver, en tout point $\vv{M}\in\Omega$ :
+
+| Champ inconnu | Notation | Nombre d'inconnues |
+|:--|:--:|:--:|
+| déplacement | $\vv{u}(\vv{M})$ | 3 |
+| déformations | $\eps(\vv{M})$ | 6 |
+| contraintes | $\sig(\vv{M})$ | 6 |
+| **total** | | **15** |
+
+Pour cela, nous disposons, après le cours de MMC, des équations suivantes :
+
+| Équation | Nombre d'équations |
+|:--|:--:|
+| $\eps = \tsd{\nabla}_{\text{sym}}\vv{u}$ (compatibilité, @eq-eps-lin) | 6 |
+| $\dive\sig + \vv{f} = \rho\vv{\gamma}$ (équilibre, @eq-pfd) | 3 |
+| **total** | **9** |
+
+: {tbl-colwidths="[70,30]"}
+
+# Notion de loi de comportement {#sec-loi}
+
+Il nous manque alors **6 équations** pour espérer pouvoir résoudre le problème de mécanique avec une logique purement comptable (on parle ici des équations dans le volume, pas des conditions aux limites).
+
+En effet, les équations décrites plus haut ne décrivent que la cinématique et le respect du PFD, mais sont **aveugles à la matière** du solide étudié. Les 6 équations manquantes pour **fermer le problème** viennent décrire le comportement de la matière.
+
+::: {.callout-tip}
+## Analogie avec le ressort
+
+- cinématique : $\Delta \ell = x - x_0$, analogue de $\eps$ ;
+- PFD : $m\ddot{x} = F_{\text{ext}} - F_{\text{ressort}}$, analogue de $\dive\sig + \vv{f} = \rho\vv{\gamma}$ ;
+- c'est la **loi de Hooke** qui ferme le problème : $F_{\text{ressort}} = -k\,\Delta\ell$.
+:::
+
+::: {.callout-important}
+## Définition : loi de comportement
+
+Nous appelons **loi de comportement** la fonction tensorielle qui relie la contrainte et la déformation :
+$$
+\sig = \mathcal{F}\big(\eps(\vv{M},t),\, T,\, \dots\big).
+$$
+:::
+
+Des exemples de tracés illustrant certains liens $\eps/\sig$ sont donnés dans les slides.
+
+Il existe une grande variété de comportements, et l'objet de ce cours est d'étudier l'**élasticité linéaire** :
+
+Élasticité
+: l'état de contrainte à un instant donné dépend **uniquement** de l'état de déformation à ce même instant (indépendamment de l'histoire du chargement et de la vitesse de chargement). Il n'y a pas de dissipation : le comportement est **réversible**.
+
+Linéaire
+: valide uniquement sous l'hypothèse HPP ; la relation reliant le tenseur des déformations linéarisé et le tenseur de Cauchy est **linéaire**.
+
+::: {.callout-note}
+## Élasticité n'implique pas linéarité
+
+Les deux hypothèses sont **indépendantes**. Un matériau peut être **élastique sans être linéaire** : c'est le cas des matériaux **hyperélastiques** (caoutchoucs, élastomères, tissus biologiques mous), qui subissent de grandes déformations réversibles. La contrainte dérive toujours d'un potentiel élastique (comportement réversible, sans dissipation), mais ce potentiel n'est plus quadratique : la relation contrainte–déformation est non linéaire. L'élasticité linéaire n'en est que l'approximation au premier ordre, au voisinage de l'état naturel et sous l'hypothèse HPP.
+:::
+
+La @fig-courbe-traction compare la loi élastique linéaire à deux lois non linéaires :
+
+- une loi **hyperélastique** : élastique mais non linéaire (courbe en S typique des caoutchoucs), la décharge suit le même chemin que la charge ;
+- une loi **élastoplastique** : linéaire au début, puis non élastique au-delà d'un certain seuil, avec une déformation résiduelle $\varepsilon^p$ après décharge.
+
+Dans les deux cas, l'élasticité linéaire ne décrit que le comportement au voisinage de l'origine (pente $E$) : c'est cette zone, mise en évidence sur la figure, qui constitue le **cadre du cours**.
+
+```{python}
+#| label: fig-courbe-traction
+#| fig-cap: "Deux exemples de lois de comportement en traction, comparées à la loi élastique linéaire tangente à l'origine (pente $E$, en tirets). La zone bleu clair, où la loi se confond avec sa tangente, est le **cadre de ce cours** (élasticité linéaire). À gauche : loi hyperélastique en S (type caoutchouc) : seules les petites déformations relèvent de l’élasticité linéaire (HPP) ; charge et décharge suivent la même courbe. À droite : loi élastoplastique à écrouissage linéaire (type acier) ; la décharge se fait avec la pente $E$ et laisse une déformation résiduelle $\\varepsilon^p$. Valeurs illustratives."
+from plotly.subplots import make_subplots
+
+fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.12,
+                    subplot_titles=("Loi hyperélastique (caoutchouc)",
+                                    "Loi élastoplastique (acier)"))
+
+# Hyperélastique : courbe en S (illustrative)
+# partie linéaire (pente E_h), puis plateau (adoucissement), puis raidissement
+E_h, s0, k, n = 1.5, 1.5, 0.025, 3          # MPa, MPa, MPa, -
+eps_h = np.linspace(0, 6, 400)              # déformation (sans unité)
+sig_h = E_h * eps_h / (1 + (E_h * eps_h / s0)**n)**(1 / n) + k * eps_h**3
+eps_lin_h = 0.1                             # zone linéaire : petites déformations (HPP)
+
+def zone_lineaire(x1, y1, col):
+    # Zone où la loi se confond avec sa tangente : cadre du cours
+    fig.add_trace(go.Scatter(x=[0, x1, x1, 0, 0], y=[0, 0, y1, y1, 0], fill="toself",
+                             fillcolor="rgba(155, 162, 255, 0.35)", line_width=0,
+                             mode="lines", hoverinfo="skip", showlegend=(col == 1),
+                             name="zone linéaire : cadre du cours"),
+                  row=1, col=col)
+
+zone_lineaire(eps_lin_h * 100, 8, 1)
+fig.add_annotation(x=eps_lin_h * 50, y=4, text="élasticité linéaire :<br><b>cadre du cours</b>",
+                   showarrow=True, ax=90, ay=-30, xanchor="left",
+                   font=dict(color=COULEURS[2]), row=1, col=1)
+fig.add_trace(go.Scatter(x=eps_h * 100, y=sig_h, mode="lines",
+                         name="loi non linéaire (charge)",
+                         line=dict(color=COULEURS[0], width=3),
+                         hovertemplate="ε = %{x:.0f} %<br>σ = %{y:.2f} MPa<extra></extra>"),
+              row=1, col=1)
+fig.add_trace(go.Scatter(x=eps_h[::-1] * 100, y=sig_h[::-1], mode="lines",
+                         name="décharge",
+                         line=dict(color=COULEURS[1], width=2, dash="dot"),
+                         hovertemplate="ε = %{x:.0f} %<br>σ = %{y:.2f} MPa<extra></extra>"),
+              row=1, col=1)
+fig.add_trace(go.Scatter(x=[0, 200], y=[0, 2 * E_h], mode="lines",
+                         name="élasticité linéaire (pente E)",
+                         line=dict(color=COULEURS[2], width=2, dash="dash")),
+              row=1, col=1)
+
+# Élastoplastique à écrouissage linéaire
+E = 210e3          # MPa
+sig_y = 300.0      # MPa, limite d'élasticité (illustratif)
+H = 5e3            # MPa, module d'écrouissage (illustratif)
+eps_y = sig_y / E
+eps_max = 0.015
+eps_c = np.linspace(0, eps_max, 600)
+sig_c = np.where(eps_c <= eps_y, E * eps_c, sig_y + H * (eps_c - eps_y))
+sig_max = sig_c[-1]
+eps_p = eps_max - sig_max / E               # déformation résiduelle
+
+zone_lineaire(eps_y * 100, 450, 2)
+fig.add_annotation(x=eps_y * 50, y=150, text="élasticité linéaire :<br><b>cadre du cours</b>",
+                   showarrow=True, ax=90, ay=0, xanchor="left",
+                   font=dict(color=COULEURS[2]), row=1, col=2)
+fig.add_trace(go.Scatter(x=eps_c * 100, y=sig_c, mode="lines", showlegend=False,
+                         line=dict(color=COULEURS[0], width=3),
+                         hovertemplate="ε = %{x:.3f} %<br>σ = %{y:.0f} MPa<extra></extra>"),
+              row=1, col=2)
+fig.add_trace(go.Scatter(x=[eps_max * 100, eps_p * 100], y=[sig_max, 0], mode="lines",
+                         showlegend=False,
+                         line=dict(color=COULEURS[1], width=2, dash="dot"),
+                         hovertemplate="ε = %{x:.3f} %<br>σ = %{y:.0f} MPa<extra></extra>"),
+              row=1, col=2)
+fig.add_trace(go.Scatter(x=[0, 2 * eps_y * 100], y=[0, 2 * sig_y], mode="lines",
+                         showlegend=False,
+                         line=dict(color=COULEURS[2], width=2, dash="dash")),
+              row=1, col=2)
+fig.add_annotation(x=eps_p * 100, y=0, text="ε<sup>p</sup>", showarrow=True,
+                   ax=-40, ay=-35, row=1, col=2)
+
+fig.update_xaxes(title_text="déformation ε (%)")
+fig.update_yaxes(title_text="contrainte σ (MPa)", row=1, col=1)
+fig.update_yaxes(range=[0, 8], row=1, col=1)
+fig.update_yaxes(range=[0, 450], row=1, col=2)
+fig.update_layout(height=450, legend=dict(orientation="h", y=-0.25, x=0.5, xanchor="center"))
+fig.show()
+```
+
+## Potentiel élastique {#sec-potentiel}
+
+Puisque le travail de déformation est indépendant du chemin de chargement, la contrainte $\sig$ dérive d'un **potentiel** $\wel$ tel que
+$$
+\boxed{\sig = \frac{\partial \wel}{\partial \eps}
+\iff \sigma_{ij} = \frac{\partial \wel}{\partial \varepsilon_{ij}}.}
+$$ {#eq-potentiel}
+
+On justifie ce résultat par analogie avec les forces conservatives.
+
+::: {.callout-note}
+## Rappel : force conservative et énergie potentielle
+
+Par définition, une force est **conservative** si son travail entre deux points $A$ et $B$ ne dépend pas du chemin suivi. On part d'un point $O$ arbitraire vers un point $\vv{M}$ et on pose
+$$
+E_p(\vv{M}) = -W_{O\to M}(\vv{F}) = -\int_O^M \vv{F}\cdot d\vv{x}.
+$$
+L'intégrale a une valeur unique car le travail ne dépend pas du chemin : $E_p(\vv{M})$ est donc une **fonction d'état**.
+
+Étudions la variation de $E_p$ entre deux points $\vv{M}$ et $\vv{M}'$ infiniment proches :
+$$
+\begin{aligned}
+dE_p = E_p(\vv{M}') - E_p(\vv{M})
+&= -\int_O^{M'} \vv{F}\cdot d\vv{x} + \int_O^{M} \vv{F}\cdot d\vv{x}
+&& \text{(chemin indifférent + Chasles)}\\
+&= -\int_M^{M'} \vv{F}\cdot d\vv{x}
+= -\vv{F}\cdot\int_M^{M'} d\vv{x}
+&& (\vv{F} \text{ constante entre } \vv{M} \text{ et } \vv{M}')\\
+&= -\vv{F}\cdot d\vv{x}
+&& (\vv{M}' = \vv{M} + d\vv{x}).
+\end{aligned}
+$$
+Par identification avec $dE_p = \grad(E_p)\cdot d\vv{x}$, on obtient $\boxed{\vv{F} = -\grad(E_p)}$.
+:::
+
+De manière analogue, le **travail élémentaire reçu par la matière** (opposé à celui fourni par les efforts intérieurs) vaut
+$$
+\delta w = \sig : d\eps .
+$$
+
+Puisque ce travail est indépendant du chemin, on peut définir une fonction univoque
+$$
+w(\eps) = \int_{\tsd{0}}^{\eps} \sig(\tilde{\eps}) : d\tilde{\eps}.
+$$
+
+Alors
+$$
+dw = w(\eps + d\eps) - w(\eps) = \int_{\eps}^{\eps + d\eps} \sig : d\tilde{\eps}
+= \sig : d\eps
+\qquad (\sig \text{ constant sur } d\eps).
+$$
+
+Par identification avec $dw = \dfrac{\partial w}{\partial \eps} : d\eps$, on retrouve @eq-potentiel :
+$$
+\sig = \frac{\partial w}{\partial \eps}.
+$$
+
+::: {.callout-note collapse="true"}
+## Remarques
+
+1. Par rapport au travail avec $\vv{F}$, la force de rappel du ressort qui s'oppose au mouvement : ici, la convention est que $\sig$ représente l'effort appliqué à la matière pour garantir sa cohésion. D'où les signes opposés :
+   $\vv{F} = -\grad(E_p)$ mais $\sig = +\dfrac{\partial w}{\partial \eps}$.
+2. $\delta w$ représente un **échange d'énergie** avec l'extérieur (une *quantité* de travail fournie), tandis que $dw$ représente la **variation d'énergie stockée** entre deux déformations proches.
+:::
+
+# Élasticité linéaire {#sec-elas-lin}
+
+## Tenseur d'élasticité {#sec-tenseur-C}
+
+$\sig$ est linéaire en $\eps$. Cela signifie que chaque composante de $\sig$ est une combinaison linéaire des composantes de $\eps$ :
+$$
+\begin{aligned}
+\sigma_{11} &= C_{1111}\,\varepsilon_{11} + C_{1112}\,\varepsilon_{12} + C_{1113}\,\varepsilon_{13} + \cdots\\
+&\ \,\vdots\\
+\sigma_{33} &= C_{3313}\,\varepsilon_{13} + C_{3323}\,\varepsilon_{23} + C_{3333}\,\varepsilon_{33} + \cdots
+\end{aligned}
+$$
+
+D'où l'introduction d'un **tenseur d'ordre 4** (quatre indices) $\Cel$, appelé **tenseur d'élasticité linéaire**, tel que
+$$
+\sig = \Cel : \eps
+\iff \sigma_{ij} = C_{ijkl}\,\varepsilon_{kl},
+\qquad\text{soit, par identification,}\quad
+C_{ijkl} = \frac{\partial \sigma_{ij}}{\partial \varepsilon_{kl}}.
+$$ {#eq-hooke-general}
+
+## Potentiel élastique linéaire {#sec-potentiel-lin}
+
+Dans le cas de l'élasticité linéaire, on a donc
+$$
+\boxed{\wel = \frac{1}{2}\,\eps : \Cel : \eps}
+$$ {#eq-wel-lin}
+et l'on retrouve bien
+$$
+\sig = \frac{\partial \wel}{\partial \eps} = \Cel : \eps .
+$$
+
+::: {.callout-tip}
+## Analogie avec le ressort
+
+$$
+\wel = \frac{1}{2}\,k\,\Delta\ell^2,
+\qquad
+F_{\text{ext}\to\text{ressort}} = \frac{\partial \wel}{\partial \Delta\ell} = k\,\Delta\ell
+\;\big(= -F_{\text{rappel}}\big).
+$$
+:::
+
+## Symétries et composantes indépendantes {#sec-symetries}
+
+$\Cel$ est un tenseur d'ordre 4 de $3\times3\times3\times3 = 81$ composantes. Cependant, du fait des symétries de $\sig$ et $\eps$, on peut réduire le nombre de composantes indépendantes.
+
+**Petites symétries** (héritées de $\sig = \T\sig$ et $\eps = \T\eps$) :
+$$
+C_{ijkl} = C_{jikl}
+\qquad\text{et}\qquad
+C_{ijkl} = C_{ijlk}.
+$$
+
+**Grande symétrie** (héritée de l'existence du potentiel) :
+$$
+C_{ijkl} = \frac{\partial \sigma_{ij}}{\partial \varepsilon_{kl}}
+= \frac{\partial^2 \wel}{\partial \varepsilon_{ij}\,\partial \varepsilon_{kl}}
+= C_{klij}.
+$$
+
+::: {.callout-important}
+## Décompte des composantes indépendantes
+
+- Chacune des petites symétries fait passer le nombre de combinaisons d'indices indépendantes de 9 à 6 : $11, 22, 33$ puis $12, 13, 23$. Les petites symétries font donc tomber les $9\times 9 = 81$ composantes à $6\times6 = 36$ (une matrice $6\times6$ en notation de Voigt).
+- La grande symétrie impose à cette matrice $6\times6$ d'être **symétrique** : sur 36 cases, 6 sont sur la diagonale et 30 hors diagonale, dont seulement 15 indépendantes.
+
+D'où $15 + 6 = \mathbf{21}$ **composantes indépendantes** pour le matériau élastique linéaire le plus général (anisotrope).
+:::
+
+## Notation de (Kelvin–)Voigt {#sec-voigt}
+
+Afin de permettre une résolution par algèbre linéaire classique, on « vectorise » (aplatit) les tenseurs symétriques d'ordre 2 que sont $\sig$ et $\eps$.
+
+::: {.callout-note}
+## Remarque
+
+La forme tensorielle est plus compacte et géométrique : la prise en compte des rotations et changements de base est simple, sans avoir à utiliser d'énormes matrices de rotation pour $\sig$ et $\eps$ (matrices de Bond). Le pire étant avec la notation de Voigt : il faut des matrices différentes pour $\sigma$ et $\varepsilon$.
+:::
+
+### Notation de Voigt
+
+$$
+\underbrace{\begin{pmatrix}
+\sigma_{11}\\ \sigma_{22}\\ \sigma_{33}\\ \sigma_{23}\\ \sigma_{31}\\ \sigma_{12}
+\end{pmatrix}}_{\Sigma}
+=
+\begin{bmatrix}
+C_{11} & C_{12} & \cdots & & & C_{16}\\
+ & \ddots & & & & \vdots\\
+ & & & & & \\
+ & \text{sym} & & & & C_{56}\\
+ & & & & & C_{66}
+\end{bmatrix}
+\underbrace{\begin{pmatrix}
+\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ 2\varepsilon_{23}\\ 2\varepsilon_{31}\\ 2\varepsilon_{12}
+\end{pmatrix}}_{E}
+$$ {#eq-voigt}
+
+Pourquoi des facteurs 2 ? Calculons l'énergie de déformation :
+$$
+\begin{aligned}
+\sig : \eps
+&= \begin{pmatrix}
+\sigma_{11} & \sigma_{12} & \sigma_{13}\\
+\sigma_{12} & \sigma_{22} & \sigma_{23}\\
+\sigma_{13} & \sigma_{23} & \sigma_{33}
+\end{pmatrix}
+:
+\begin{pmatrix}
+\varepsilon_{11} & \varepsilon_{12} & \varepsilon_{13}\\
+\varepsilon_{12} & \varepsilon_{22} & \varepsilon_{23}\\
+\varepsilon_{13} & \varepsilon_{23} & \varepsilon_{33}
+\end{pmatrix}\\
+&= \sigma_{11}\varepsilon_{11} + \sigma_{22}\varepsilon_{22} + \sigma_{33}\varepsilon_{33}
++ 2\,\sigma_{12}\varepsilon_{12} + 2\,\sigma_{13}\varepsilon_{13} + 2\,\sigma_{23}\varepsilon_{23}\\
+&= \Sigma\cdot E .
+\end{aligned}
+$$
+
+L'énergie qui, avec les tenseurs, se calcule avec un produit doublement contracté, se calcule avec un **produit scalaire de vecteurs** en notation de Voigt.
+
+### Notation de Kelvin–Voigt
+
+::: {.callout-warning}
+## Attention
+
+Avec la notation de Voigt, le produit scalaire euclidien classique de deux vecteurs n'est pas égal au produit doublement contracté des tenseurs associés : $\Sigma^a\cdot\Sigma^b \neq \sig^a : \sig^b$ et $E^a\cdot E^b \neq \eps^a : \eps^b$. Pour cela, il faut utiliser la notation de **Kelvin–Voigt**, plus rigoureuse.
+:::
+
+$$
+\begin{pmatrix}
+\sigma_{11}\\ \sigma_{22}\\ \sigma_{33}\\ \sqrt{2}\,\sigma_{23}\\ \sqrt{2}\,\sigma_{31}\\ \sqrt{2}\,\sigma_{12}
+\end{pmatrix}
+=
+\begin{bmatrix}
+\tilde{C}_{11} & \tilde{C}_{12} & \cdots & \tilde{C}_{16}\\
+ & \ddots & & \vdots\\
+ & \text{sym} & & \tilde{C}_{56}\\
+ & & & \tilde{C}_{66}
+\end{bmatrix}
+\begin{pmatrix}
+\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ \sqrt{2}\,\varepsilon_{23}\\ \sqrt{2}\,\varepsilon_{31}\\ \sqrt{2}\,\varepsilon_{12}
+\end{pmatrix}
+$$ {#eq-kelvin-voigt}
+
+# Élasticité linéaire isotrope {#sec-isotrope}
+
+## Potentiel élastique isotrope {#sec-pot-iso}
+
+Nous supposons enfin que la loi de comportement est linéaire et **isotrope**, c'est-à-dire qu'elle est invariante par toute rotation $\tsd{R}$ :
+$$
+\wel\big(\T\tsd{R}\,\eps\,\tsd{R}\big) = \wel(\eps).
+$$
+
+La loi de comportement doit donc uniquement dépendre des trois valeurs propres de $\eps$. Il y a une bijection entre ces valeurs propres et les **invariants** du tenseur de déformation, mais ces derniers sont plus commodes à utiliser : ils sont continûment dérivables partout (fonctions polynomiales des composantes) et permettent d'aboutir à des expressions tensorielles simples à la dérivation.
+
+On cherche donc à écrire le potentiel élastique comme fonction des invariants
+$$
+I_1 = \tr\eps, \qquad
+I_2 = \eps:\eps = \tr\big(\eps^2\big), \qquad
+I_3 = \det\eps .
+$$
+
+La loi étant linéaire, on cherche une fonction **quadratique** (homogène de degré 2) des composantes. Le déterminant étant un produit de 3 composantes, il est d'ordre 3 : il ne reste que $I_1^2$ et $I_2$ :
+$$
+\boxed{\wel = \frac{\lambda}{2}\,\big(\tr\eps\big)^2 + \mu\,\eps:\eps}
+$$ {#eq-wel-iso}
+où $\lambda$ et $\mu$ sont deux constantes (paramètres matériaux) appelées **coefficients de Lamé**, exprimés en Pa.
+
+## Loi de Hooke isotrope {#sec-hooke}
+
+Pour trouver la loi de comportement associée à ce potentiel, on le dérive, en utilisant
+$\dfrac{\partial \varepsilon_{ij}}{\partial \varepsilon_{kl}} = \delta_{ik}\,\delta_{jl}$ :
+$$
+\begin{aligned}
+\sigma_{ij} = \frac{\partial \wel}{\partial \varepsilon_{ij}}
+&= \frac{\lambda}{2}\,\frac{\partial\,(\varepsilon_{kk})^2}{\partial \varepsilon_{ij}}
++ \mu\,\frac{\partial\,(\varepsilon_{kl}\varepsilon_{kl})}{\partial \varepsilon_{ij}}\\
+&= \frac{\lambda}{2}\times 2\,\varepsilon_{kk}\,\frac{\partial \varepsilon_{mm}}{\partial \varepsilon_{ij}}
++ \mu\left(\frac{\partial \varepsilon_{kl}}{\partial \varepsilon_{ij}}\,\varepsilon_{kl}
++ \varepsilon_{kl}\,\frac{\partial \varepsilon_{kl}}{\partial \varepsilon_{ij}}\right)\\
+&= \lambda\,\varepsilon_{kk}\,\delta_{ij}
++ \mu\,\big(\underbrace{\delta_{ik}\delta_{jl}\,\varepsilon_{kl} + \delta_{ik}\delta_{jl}\,\varepsilon_{kl}}_{2\,\varepsilon_{ij}}\big),
+\end{aligned}
+$$
+soit la **loi de Hooke** isotrope :
+$$
+\boxed{\sig = \lambda\,\tr(\eps)\,\Id + 2\mu\,\eps .}
+$$ {#eq-hooke}
+
+::: {.callout-note}
+## Remarque : dérivation directement en notation tensorielle
+
+On peut aussi obtenir ce résultat sans passer par les indices, en généralisant aux tenseurs d'ordre 2 les règles de dérivation usuelles : la double contraction « $:$ » joue le rôle d'un produit, auquel on applique la règle de dérivation d'un produit.
+
+On peut ainsi voir que $\tr\eps = \eps:\Id$, d'où
+$$
+\frac{\partial\,(\tr\eps)^2}{\partial \eps}
+= \frac{\partial\,(\eps:\Id)^2}{\partial \eps}
+= 2\times\Id\times(\eps:\Id)
+= 2\,\tr(\eps)\,\Id ,
+$$
+exactement comme $\dfrac{d\,(a x)^2}{dx} = 2\,a\,(a x)$ pour des scalaires. De même, $\eps:\eps$ est un « carré » :
+$$
+\frac{\partial\,(\eps:\eps)}{\partial \eps} = 2\,\eps .
+$$
+On retrouve donc $\sig = \dfrac{\lambda}{2}\times 2\,\tr(\eps)\,\Id + \mu\times 2\,\eps = \lambda\,\tr(\eps)\,\Id + 2\mu\,\eps$.
+:::
+
+## Décomposition sphérique / déviatorique {#sec-deviateur}
+
+Suivant l'interprétation que l'on veut avoir de cette loi, on peut la réorganiser en faisant intervenir le **déviateur** de $\eps$,
+$$
+\tsd{e} = \eps - \frac{1}{3}\,\tr(\eps)\,\Id ,
+$$
+qui caractérise la distorsion de forme sans prendre en compte la variation de volume ($\tsd{e}$ est à trace nulle). On peut alors écrire
+$$
+\sig = \lambda\,\tr(\eps)\,\Id + 2\mu\left(\tsd{e} + \frac{1}{3}\,\tr(\eps)\,\Id\right)
+= \underbrace{\left(\lambda + \frac{2}{3}\mu\right)}_{K}\tr(\eps)\,\Id + 2\mu\,\tsd{e},
+$$ {#eq-hooke-K}
+où $K = \lambda + \tfrac{2}{3}\mu$ est le **module de compressibilité**.
+
+## Exemples : donner du sens à $\mu$ et $K$ {#sec-exemples-ab}
+
+### Exemple a : cisaillement simple {#sec-cisaillement}
+
+On considère un carré dont la base est bloquée et que l'on cisaille d'un angle $\gamma$ (@fig-cisaillement) :
+$$
+\vv{u} = \gamma\,X_2\,\vv{e}_1 .
+$$
+
+Alors
+$$
+\eps = \begin{pmatrix} 0 & \gamma/2 & 0\\ \gamma/2 & 0 & 0\\ 0 & 0 & 0 \end{pmatrix},
+\qquad
+\sig = 2\mu\,\eps + \lambda\underbrace{\tr(\eps)}_{0}\Id
+= \begin{pmatrix} 0 & \mu\gamma & 0\\ \mu\gamma & 0 & 0\\ 0 & 0 & 0 \end{pmatrix}.
+$$
+
+$\mu$ peut aussi être noté $G$ : c'est le **module de cisaillement**,
+$$
+\mu = \frac{\sigma_{12}}{2\,\varepsilon_{12}}
+\;\left(= \frac{\sigma_{13}}{2\,\varepsilon_{13}} = \frac{\sigma_{23}}{2\,\varepsilon_{23}}
+\text{ suivant les directions dans lesquelles on cisaille}\right).
+$$
+
+```{python}
+#| label: fig-cisaillement
+#| fig-cap: "Cisaillement simple $\\vv{u} = \\gamma X_2 \\vv{e}_1$ d'un carré unité (base bloquée). Le curseur fait varier $\\gamma$ ; la valeur de $\\sigma_{12} = \\mu\\gamma$ est donnée pour $\\mu = 80$ GPa (acier). Les déformations sont exagérées pour la lecture."
+mu = 80e3  # MPa
+gammas = np.round(np.linspace(0, 0.6, 13), 2)
+
+def carre_cisaille(g):
+    X = np.array([0, 1, 1, 0, 0])
+    Y = np.array([0, 0, 1, 1, 0])
+    return X + g * Y, Y
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=[0, 1, 1, 0, 0], y=[0, 0, 1, 1, 0], mode="lines",
+                         name="configuration initiale",
+                         line=dict(color="grey", dash="dot")))
+for k, g in enumerate(gammas):
+    x, y = carre_cisaille(g)
+    fig.add_trace(go.Scatter(x=x, y=y, fill="toself", mode="lines",
+                             name="configuration déformée",
+                             line=dict(color=COULEURS[0], width=3),
+                             fillcolor="rgba(42,157,143,0.25)",
+                             visible=(k == len(gammas) // 2)))
+
+steps = []
+for k, g in enumerate(gammas):
+    vis = [True] + [j == k for j in range(len(gammas))]
+    steps.append(dict(method="update", label=f"{g:.2f}",
+                      args=[{"visible": vis},
+                            {"title": f"γ = {g:.2f}  →  σ₁₂ = μγ = {mu * g / 1e3:.1f} GPa"}]))
+
+g0 = gammas[len(gammas) // 2]
+fig.update_layout(
+    sliders=[dict(active=len(gammas) // 2, currentvalue=dict(prefix="γ = "),
+                  steps=steps, pad=dict(t=40))],
+    title=f"γ = {g0:.2f}  →  σ₁₂ = μγ = {mu * g0 / 1e3:.1f} GPa",
+    xaxis=dict(range=[-0.2, 1.9], title="x₁", scaleanchor="y"),
+    yaxis=dict(range=[-0.2, 1.3], title="x₂"),
+    height=480, legend=dict(x=0.99, y=0.02, xanchor="right", yanchor="bottom", bgcolor="rgba(255,255,255,0.7)"),
+)
+fig.show()
+```
+
+### Exemple b : compression isostatique {#sec-isostatique}
+
+On comprime un cube uniformément dans toutes les directions :
+$$
+\vv{u} = \beta\,X_i\,\vv{e}_i, \qquad \beta < 0 .
+$$
+
+Alors
+$$
+\eps = \begin{pmatrix} \beta & 0 & 0\\ 0 & \beta & 0\\ 0 & 0 & \beta \end{pmatrix} = \beta\,\Id,
+\qquad
+\sig = 2\mu\underbrace{\beta\,\Id}_{\eps} + \lambda\times\underbrace{3\beta}_{\tr\eps}\,\Id
+= (2\mu + 3\lambda)\,\beta\,\Id = -p\,\Id .
+$$
+
+On a donc, avec @eq-dilatation,
+$$
+\frac{\Delta V}{V} = \tr\eps = 3\beta = \frac{3\times(-p)}{2\mu + 3\lambda} = -\frac{p}{K},
+$$
+d'où $K\,\tr\eps = -p$, soit
+$$
+\boxed{K\,\frac{\Delta V}{V} = -p .}
+$$ {#eq-K-isostatique}
+
+$K$ relie donc directement la pression appliquée à la variation relative de volume. La @fig-isostatique permet de jouer avec $\beta$.
+
+```{python}
+#| label: fig-isostatique
+#| fig-cap: "Compression isostatique $\\vv{u} = \\beta X_i \\vv{e}_i$ d'un cube unité (coupe dans le plan $(\\vv{e}_1, \\vv{e}_2)$, coin en $O$ fixe). Le curseur fait varier $\\beta$ ; le titre donne $\\Delta V / V = 3\\beta$ et la pression $p = -3K\\beta$ pour $K = 175$ GPa (acier). Les déformations sont exagérées pour la lecture."
+K_acier = 175e3  # MPa
+betas = np.round(np.linspace(-0.30, 0.0, 13), 3)
+
+def carre_comprime(b):
+    c = 1 + b
+    return [0, c, c, 0, 0], [0, 0, c, c, 0]
+
+def titre_iso(b):
+    return f"β = {b:.3f}  →  ΔV/V = 3β = {3 * b:+.2f},  p = −3Kβ = {-3 * K_acier * b / 1e3:.0f} GPa"
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=[0, 1, 1, 0, 0], y=[0, 0, 1, 1, 0], mode="lines",
+                         name="configuration initiale",
+                         line=dict(color=COULEURS[2], dash="dot")))
+k0 = 5
+for k, b in enumerate(betas):
+    x, y = carre_comprime(b)
+    fig.add_trace(go.Scatter(x=x, y=y, fill="toself", mode="lines",
+                             name="configuration déformée",
+                             line=dict(color=COULEURS[0], width=3),
+                             fillcolor="rgba(55,70,255,0.18)",
+                             visible=(k == k0)))
+
+# Flèches de pression sur les faces chargées (x = 1 et y = 1 dans la coupe)
+def fleches(b):
+    c = 1 + b
+    ann = []
+    for t in (0.25, 0.5, 0.75):
+        ann.append(dict(x=c, y=t * c, ax=c + 0.25, ay=t * c, xref="x", yref="y",
+                        axref="x", ayref="y", showarrow=True, arrowhead=2,
+                        arrowwidth=2, arrowcolor=COULEURS[1], text=""))
+        ann.append(dict(x=t * c, y=c, ax=t * c, ay=c + 0.25, xref="x", yref="y",
+                        axref="x", ayref="y", showarrow=True, arrowhead=2,
+                        arrowwidth=2, arrowcolor=COULEURS[1], text=""))
+    return ann
+
+steps = []
+for k, b in enumerate(betas):
+    vis = [True] + [j == k for j in range(len(betas))]
+    steps.append(dict(method="update", label=f"{b:.3f}",
+                      args=[{"visible": vis},
+                            {"title": titre_iso(b), "annotations": fleches(b)}]))
+
+fig.update_layout(
+    sliders=[dict(active=k0, currentvalue=dict(prefix="β = "), steps=steps, pad=dict(t=40))],
+    title=titre_iso(betas[k0]),
+    annotations=fleches(betas[k0]),
+    xaxis=dict(range=[-0.2, 1.5], title="x₁", scaleanchor="y"),
+    yaxis=dict(range=[-0.2, 1.4], title="x₂"),
+    height=480,
+    legend=dict(x=0.99, y=0.02, xanchor="right", yanchor="bottom", bgcolor="rgba(255,255,255,0.7)"),
+)
+fig.show()
+```
+
+## Inversion de la loi de comportement {#sec-inversion}
+
+De manière analogue à $\Cel$, on peut définir le **tenseur de souplesse** $\Sel = \Cel^{-1}$ tel que
+$$
+\eps = \Sel : \sig .
+$$
+
+Le potentiel élastique peut alors se réécrire
+$$
+\wel = \frac{1}{2}\,\sig : \Sel : \sig
+\qquad \left(\text{analogie : } \wel = \frac{1}{2}\frac{F^2}{k}\right).
+$$
+
+Dans le cas isotrope, on peut mettre $\Sel$ en exergue en inversant la loi @eq-hooke reliant $\sig$ à $\eps$. On prend la trace de cette expression (avec $\tr\Id = 3$) :
+$$
+\tr\sig = 3\lambda\,\tr\eps + 2\mu\,\tr\eps = (2\mu + 3\lambda)\,\tr\eps .
+$$
+
+D'où
+$$
+\sig = \frac{\lambda\,\tr\sig}{2\mu + 3\lambda}\,\Id + 2\mu\,\eps
+\quad\Longrightarrow\quad
+\boxed{\eps = \frac{1}{2\mu}\left[\sig - \frac{\lambda\,\tr\sig}{2\mu + 3\lambda}\,\Id\right].}
+$$
+
+### Module d'Young et coefficient de Poisson {#sec-E-nu}
+
+En posant
+$$
+\frac{1+\nu}{E} = \frac{1}{2\mu}
+\qquad\text{et}\qquad
+\frac{\nu}{E} = \frac{\lambda}{2\mu\,(3\lambda + 2\mu)},
+$$
+la relation devient
+$$
+\boxed{\eps = \frac{1+\nu}{E}\,\sig - \frac{\nu}{E}\,\big(\tr\sig\big)\,\Id .}
+$$ {#eq-hooke-inverse}
+
+::: {.callout-note collapse="true"}
+## Calcul de $E$ et $\nu$ en fonction de $\lambda$ et $\mu$
+
+$$
+\frac{1}{E} + \frac{\nu}{E} = \frac{1}{2\mu}
+\;\Rightarrow\;
+\frac{1}{E} = \frac{1}{2\mu} - \frac{\lambda}{2\mu\,(3\lambda + 2\mu)}
+= \frac{3\lambda + 2\mu - \lambda}{2\mu\,(3\lambda + 2\mu)}
+= \frac{\lambda + \mu}{\mu\,(3\lambda + 2\mu)} ,
+$$
+soit $E = \dfrac{\mu\,(3\lambda + 2\mu)}{\lambda + \mu}$. Puis
+$$
+1 + \nu = \frac{E}{2\mu} = \frac{3\lambda + 2\mu}{2(\lambda + \mu)}
+\quad\Rightarrow\quad
+\nu = \frac{3\lambda + 2\mu}{2(\lambda + \mu)} - 1 = \frac{\lambda}{2(\lambda + \mu)} .
+$$
+:::
+
+### Exemple c : traction simple — donner du sens à $E$ et $\nu$ {#sec-traction}
+
+On considère un état de **traction pure** :
+$$
+\sig = \begin{pmatrix} \sigma_{11} & 0 & 0\\ 0 & 0 & 0\\ 0 & 0 & 0 \end{pmatrix}.
+$$
+
+On utilise la loi de comportement @eq-hooke-inverse, qui permet de remonter à $\eps$ depuis $\sig$ :
+$$
+\eps = \frac{1+\nu}{E}\,\sig - \frac{\nu}{E}\,\tr(\sig)\,\Id
+= \begin{pmatrix}
+\sigma_{11}/E & 0 & 0\\
+0 & -\nu\,\sigma_{11}/E & 0\\
+0 & 0 & -\nu\,\sigma_{11}/E
+\end{pmatrix}.
+$$
+
+D'où $\varepsilon_{11}\,E = \sigma_{11}$, et
+$$
+\boxed{E = \frac{\sigma_{11}}{\varepsilon_{11}}}
+\qquad\qquad
+\boxed{\nu = -\frac{\varepsilon_{22}}{\varepsilon_{11}} = -\frac{\varepsilon_{33}}{\varepsilon_{11}}}
+$$
+(en effet $-\varepsilon_{22}/\varepsilon_{11} = \dfrac{\nu\,\sigma_{11}}{E}\times\dfrac{E}{\sigma_{11}} = \nu$).
+
+$E$ est le **module d'Young** (pente de la zone linéaire en traction, @fig-courbe-traction) et $\nu$ le **coefficient de Poisson**, qui mesure la contraction transverse. La @fig-poisson permet de jouer avec $\nu$.
+
+```{python}
+#| label: fig-poisson
+#| fig-cap: "Effet Poisson en traction simple : barreau de section carrée allongé de $\\varepsilon_{11}$ (exagéré à 20 %) et contracté transversalement de $\\varepsilon_{22} = -\\nu\\,\\varepsilon_{11}$. Le curseur fait varier $\\nu$ ; le titre donne la variation relative de volume $\\tr\\eps = (1-2\\nu)\\,\\varepsilon_{11}$."
+eps11 = 0.20
+nus = np.round(np.arange(0.0, 0.51, 0.05), 2)
+L0, h0 = 3.0, 1.0
+
+def rectangle(L, h):
+    return [0, L, L, 0, 0], [-h / 2, -h / 2, h / 2, h / 2, -h / 2]
+
+fig = go.Figure()
+x0, y0 = rectangle(L0, h0)
+fig.add_trace(go.Scatter(x=x0, y=y0, mode="lines", name="configuration initiale",
+                         line=dict(color="grey", dash="dot")))
+for k, nu in enumerate(nus):
+    x, y = rectangle(L0 * (1 + eps11), h0 * (1 - nu * eps11))
+    fig.add_trace(go.Scatter(x=x, y=y, fill="toself", mode="lines",
+                             name="configuration déformée",
+                             line=dict(color=COULEURS[1], width=3),
+                             fillcolor="rgba(231,111,81,0.25)",
+                             visible=(nu == 0.3)))
+
+def titre(nu):
+    return (f"ν = {nu:.2f} :  ε₂₂ = {-nu * eps11:+.3f},  "
+            f"ΔV/V = (1−2ν) ε₁₁ = {(1 - 2 * nu) * eps11:+.3f}")
+
+steps = []
+for k, nu in enumerate(nus):
+    vis = [True] + [j == k for j in range(len(nus))]
+    steps.append(dict(method="update", label=f"{nu:.2f}",
+                      args=[{"visible": vis}, {"title": titre(nu)}]))
+
+k0 = int(np.where(nus == 0.3)[0][0])
+fig.update_layout(
+    sliders=[dict(active=k0, currentvalue=dict(prefix="ν = "), steps=steps, pad=dict(t=40))],
+    title=titre(0.3),
+    xaxis=dict(range=[-0.3, 3.9], title="x₁", scaleanchor="y"),
+    yaxis=dict(range=[-0.9, 0.9], title="x₂"),
+    height=430, legend=dict(x=0.99, y=0.02, xanchor="right", yanchor="bottom", bgcolor="rgba(255,255,255,0.7)"),
+)
+fig.show()
+```
+
+### Relations entre les coefficients {#sec-relations}
+
+On retiendra les relations suivantes entre les couples $(\lambda, \mu)$ et $(E, \nu)$ :
+
+| | en fonction de $(\lambda,\mu)$ | en fonction de $(E,\nu)$ |
+|:--|:--:|:--:|
+| $E$ | $\dfrac{\mu(3\lambda+2\mu)}{\lambda+\mu}$ | — |
+| $\nu$ | $\dfrac{\lambda}{2(\lambda+\mu)}$ | — |
+| $\lambda$ | — | $\dfrac{E\nu}{(1+\nu)(1-2\nu)}$ |
+| $\mu = G$ | — | $\dfrac{E}{2(1+\nu)}$ |
+| $K$ | $\lambda + \dfrac{2}{3}\mu$ | $\dfrac{E}{3(1-2\nu)}$ |
+
+: Relations entre coefficients d'élasticité isotrope. {#tbl-relations}
+
+D'après le @tbl-relations, quand $\nu \to 1/2$, $\lambda$ et $K$ divergent (matériau **incompressible**), alors que $\mu$ reste fini.
+
+# Exercice : compression œdométrique {#sec-oedometre}
+
+::: {.callout-caution icon=false}
+## Énoncé 
+
+Un échantillon cylindrique de rayon $R$ et de hauteur $h$, constitué d'un matériau élastique linéaire isotrope $(\lambda, \mu)$, est placé dans un moule rigide. Il repose sur un fond fixe ($z = 0$), est comprimé sur sa face supérieure ($z = h$) par une pression uniforme $p$, et sa face latérale ($r = R$) glisse sans frottement contre la paroi du moule, qui empêche tout déplacement radial. On néglige les forces de volume.
+
+1. Écrire les équations du problème et les conditions aux limites.
+2. On cherche une solution sous la forme $\vv{u} = u(z)\,\vv{e}_z$.
+3. Calculer $\eps$ et $\sig$ ; en déduire l'équation vérifiée par $u$.
+4. Déterminer complètement $\vv{u}$ et $\sig$.
+5. Calculer la pression $q$ exercée par la paroi du moule sur l'échantillon.
+6. Exprimer $K$ en fonction de $E$ et $\nu$. Que se passe-t-il pour un matériau quasi incompressible ? En déduire comment mesurer $K$.
+:::
+
+::: {.callout-caution collapse="true" icon=false}
+## Correction
+
+**1.** Équations du problème :
+$$
+\left\{
+\begin{aligned}
+&\dive\sig = \vv{0} && \text{dans } \Omega\\
+&\sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id\\
+&\eps = \tfrac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right)
+\end{aligned}
+\right.
+$$
+Conditions aux limites :
+$$
+\begin{aligned}
+&\vv{u}(r,\theta,0) = \vv{0} && \text{sur } \partial\Omega_{\text{inf}},\\
+&\vv{T}(r,\theta,h) = -p\,\vv{e}_z && \text{sur } \partial\Omega_{\text{sup}},\\
+&\vv{u}(R,\theta,z)\cdot\vv{e}_r = 0,\quad
+\vv{T}(R,\theta,z)\cdot\vv{e}_\theta = 0,\quad
+\vv{T}(R,\theta,z)\cdot\vv{e}_z = 0 && \text{sur } \partial\Omega_{\text{lat}}.
+\end{aligned}
+$$
+
+**2.** $\vv{u} = u(z)\,\vv{e}_z$.
+
+**3.**
+$$
+\eps = \frac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right)
+= \begin{bmatrix} 0 & 0 & 0\\ 0 & 0 & 0\\ 0 & 0 & u_{z,z} \end{bmatrix},
+\qquad
+\sig = u_{z,z}\begin{pmatrix} \lambda & 0 & 0\\ 0 & \lambda & 0\\ 0 & 0 & \lambda + 2\mu \end{pmatrix}.
+$$
+$\dive\sig = \vv{0} \Rightarrow u_{z,zz} = 0$.
+
+**4.** Donc $u_z = a z + b$ avec $(a,b)\in\mathbb{R}^2$. $u(z=0) = 0 \Rightarrow b = 0$, d'où $u_z = a z$ et
+$$
+\sig = a\begin{pmatrix} \lambda & 0 & 0\\ 0 & \lambda & 0\\ 0 & 0 & \lambda + 2\mu \end{pmatrix}.
+$$
+Sur $\partial\Omega_{\text{sup}}$, $\sig\,\vv{e}_z = -p\,\vv{e}_z \Rightarrow a(\lambda + 2\mu) = -p \Rightarrow a = -\dfrac{p}{\lambda + 2\mu}$. Soit
+$$
+\sig = \begin{pmatrix}
+-\dfrac{\lambda p}{\lambda + 2\mu} & 0 & 0\\
+0 & -\dfrac{\lambda p}{\lambda + 2\mu} & 0\\
+0 & 0 & -p
+\end{pmatrix},
+\qquad
+\boxed{\vv{u} = -\frac{p}{\lambda + 2\mu}\,z\,\vv{e}_z .}
+$$
+
+**5.** $\sig(R,\theta,z)\,\vv{e}_r = -\dfrac{\lambda p}{\lambda + 2\mu}\,\vv{e}_r = -q\,\vv{e}_r$ (définition de $q$ comme une pression), d'où
+$$
+q = \frac{\lambda\,p}{\lambda + 2\mu}.
+$$
+
+**6.** Avec $\lambda = \dfrac{E\nu}{(1+\nu)(1-2\nu)}$ et $\mu = \dfrac{E}{2(1+\nu)}$ :
+$$
+K = \lambda + \frac{2}{3}\mu
+= \frac{E\nu}{(1+\nu)(1-2\nu)} + \frac{2}{3}\,\frac{E}{2(1+\nu)}
+= \frac{3E\nu + E(1-2\nu)}{3(1+\nu)(1-2\nu)}
+= \frac{E(1+\nu)}{3(1+\nu)(1-2\nu)}
+= \frac{E}{3(1-2\nu)} .
+$$
+Donc $K \to \infty \iff \nu \to 1/2$. Dans ce cas (matériau quasi incompressible), $\lambda \simeq K \gg \mu$ et
+$$
+\eps = \begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & 0\\ 0 & 0 & -\dfrac{p}{\lambda + 2\mu} \end{pmatrix}
+\simeq \begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & 0\\ 0 & 0 & -\dfrac{p}{\lambda} \end{pmatrix},
+\qquad -\frac{p}{\lambda} \simeq -\frac{p}{K}\ \ \text{car } K = \lambda + \tfrac{2}{3}\mu .
+$$
+D'où $K \simeq -\dfrac{p}{\varepsilon_{zz}}$ avec $p = F/S$ et $\varepsilon_{zz} = \Delta h / h$ (le déplacement $u$ est linéaire en $z$, de pente $a$, et vaut $\Delta h$ en $z = h$). Soit
+$$
+\boxed{K \simeq \frac{F}{S}\,\frac{h}{|\Delta h|}.}
+$$
+:::
+
+# Thermoélasticité {#sec-thermo}
+
+## Déformation thermique {#sec-def-thermique}
+
+On considère un solide initialement à la température $T_0$, porté à la température $T = T_0 + \Delta T$ :
+
+- $\Delta T > 0$ : **dilatation** thermique ;
+- $\Delta T < 0$ : **contraction** thermique.
+
+Quand un solide est soumis à une variation de température $\Delta T$, il se dilate ou se contracte suivant le signe de $\Delta T$. Les déformations thermiques sont directement proportionnelles à $\Delta T$, avec un coefficient de proportionnalité $\alpha$ (coefficient de dilatation thermique), ici supposé isotrope :
+$$
+\boxed{\eps^{\text{th}}(\vv{M}) = \alpha\,\Delta T(\vv{M})\,\Id .}
+$$ {#eq-eps-th}
+
+## Partition des déformations {#sec-partition}
+
+Si rien n'empêche cette dilatation, la variation de température n'entraîne aucune contrainte. Les déformations thermiques s'ajoutent aux déformations élastiques :
+$$
+\eps^{\text{total}}(\vv{M}) = \eps^{\text{élas}}(\vv{M}) + \eps^{\text{th}}(\vv{M})
+= \Sel : \sig(\vv{M}) + \eps^{\text{th}}(\vv{M})
+= \underbrace{\frac{1+\nu}{E}\,\sig - \frac{\nu}{E}\,\tr(\sig)\,\Id}_{\eps^{\text{élas}}}
++ \underbrace{\alpha\,\Delta T\,\Id}_{\eps^{\text{th}}} .
+$$
+
+Seule la partie élastique $\eps^{e} = \eps^{\text{total}} - \eps^{\text{th}}$ génère des contraintes (si $\eps^{\text{tot}} = \eps^{\text{th}}$, alors $\eps^{e} = \tsd{0}$ et $\sig = \tsd{0}$).
+
+## Loi de comportement thermoélastique {#sec-loi-thermo}
+
+$$
+\begin{aligned}
+\sig &= 2\mu\,\eps^{e} + \lambda\,\tr(\eps^{e})\,\Id\\
+&= 2\mu\left(\eps^{\text{total}} - \eps^{\text{th}}\right) + \lambda\,\tr\!\left(\eps^{\text{total}} - \eps^{\text{th}}\right)\Id\\
+&= 2\mu\,\eps^{\text{tot}} + \lambda\,\tr(\eps^{\text{tot}})\,\Id
+- \underbrace{\left(2\mu\,\eps^{\text{th}} + \lambda\,\tr(\eps^{\text{th}})\,\Id\right)}_{2\mu\alpha\Delta T\,\Id \,+\, 3\lambda\alpha\Delta T\,\Id \;=\; \alpha\Delta T\,(2\mu + 3\lambda)\,\Id}
+\end{aligned}
+$$
+
+Avec $K = \lambda + \tfrac{2}{3}\mu$, on a $\alpha\Delta T\,(2\mu + 3\lambda) = 3\alpha\,\Delta T\,K$, d'où
+$$
+\boxed{\sig = 2\mu\,\eps^{\text{tot}} + \lambda\,\tr(\eps^{\text{tot}})\,\Id - 3K\alpha\,\Delta T\,\Id .}
+$$ {#eq-thermoelas}
+
+## Exercice : cylindre bridé chauffé {#sec-exo-thermo}
+
+::: {.callout-caution icon=false}
+## Énoncé 
+
+Un cylindre d'axe $\vv{e}_z$, de rayon $R$ et de longueur $L$, en matériau thermoélastique isotrope $(E, \nu, \alpha)$, est placé entre deux appuis rigides plans sans frottement en $z = 0$ et $z = L$. Sa surface latérale est libre. On le soumet à une variation de température uniforme $\Delta T$.
+
+1. Écrire les conditions aux limites.
+2. Montrer qu'un champ de contrainte de la forme $\sig = \sigma_{zz}\,\vv{e}_z\otimes\vv{e}_z$ est admissible.
+3. Calculer le tenseur des déformations.
+:::
+
+::: {.callout-caution collapse="true" icon=false}
+## Correction
+
+**1.** Sur $\partial\Omega_{z=0}$ :
+$$
+\vv{u}(r,\theta,0)\cdot\vv{e}_z = 0, \qquad
+\vv{T}\cdot\vv{e}_\theta = 0, \quad \vv{T}\cdot\vv{e}_r = 0
+\qquad \big(\vv{T} = \sig(r,\theta,0)\,(-\vv{e}_z)\big).
+$$
+Sur $\partial\Omega_{z=L}$ :
+$$
+\vv{u}(r,\theta,L)\cdot\vv{e}_z = 0, \qquad
+\vv{T}\cdot\vv{e}_\theta = 0, \quad \vv{T}\cdot\vv{e}_r = 0
+\qquad \big(\vv{T} = \sig(r,\theta,L)\,\vv{e}_z\big).
+$$
+Sur $\partial\Omega_{\text{lat}}$ : $\vv{T} = \sig(R,\theta,z)\,\vv{e}_r = \vv{0}$.
+
+**2.** Avec $\sig = \sigma_{zz}\,\vv{e}_z\otimes\vv{e}_z$ (et $\sigma_{zz}$ uniforme), on a bien $\dive\sig = \vv{0}$ ; cette forme de champ de contrainte est donc admissible car elle permet également de vérifier les conditions aux limites (vecteur contrainte nul sur la surface latérale, purement axial sur les faces d'appui).
+
+**3.**
+$$
+\eps = \eps^{e} + \eps^{\text{th}}
+= \frac{1+\nu}{E}\,\sig - \frac{\nu}{E}\,\tr(\sig)\,\Id + \alpha\,\Delta T\,\Id ,
+$$
+d'où
+$$
+\eps = \begin{pmatrix}
+-\dfrac{\nu}{E}\,\sigma_{zz} + \alpha\Delta T & 0 & 0\\
+0 & -\dfrac{\nu}{E}\,\sigma_{zz} + \alpha\Delta T & 0\\
+0 & 0 & \dfrac{\sigma_{zz}}{E} + \alpha\Delta T
+\end{pmatrix}.
+$$
+:::
+
