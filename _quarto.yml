@@ -11,6 +11,11 @@ execute:
 
 format:
   html:
+    grid:
+      body-width: 1100px     # 800px par défaut : largeur du texte
+      sidebar-width: 250px   # sommaire à gauche
+      margin-width: 150px    # colonne de droite (300px par défaut)
+  
     output-file: index.html
     default-image-extension: svg
     theme:

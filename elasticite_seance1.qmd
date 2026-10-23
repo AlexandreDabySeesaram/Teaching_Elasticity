@@ -536,6 +536,14 @@ C_{11} & C_{12} & \cdots & & & C_{16}\\
 \end{pmatrix}}_{E}
 $$ {#eq-voigt}
 
+::: {.callout-note}
+## Astuce : l'ordre des composantes
+
+Pour retenir l'ordre de Voigt, on parcourt la partie triangulaire supérieure de $\sig$ : d'abord la diagonale de haut en bas ($\sigma_{11}$, $\sigma_{22}$, $\sigma_{33}$), puis on remonte la dernière colonne ($\sigma_{23}$, $\sigma_{13}$) et on finit par $\sigma_{12}$ (@fig-ordre-voigt).
+
+![Ordre des composantes dans la notation de Voigt.](schema_voigt){#fig-ordre-voigt width=20%}
+:::
+
 Pourquoi des facteurs 2 ? Calculons l'énergie de déformation :
 $$
 \begin{aligned}
