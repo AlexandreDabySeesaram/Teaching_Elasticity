@@ -10,3 +10,12 @@ body.quarto-light .sidebar nav[role=doc-toc] ul > li > a.active { color: #3746ff
 body.quarto-dark a { color: #9ba2ff; }
 body.quarto-dark a:hover { color: #ff808b; }
 body.quarto-dark .subtitle { color: #9ba2ff; }
+
+/* Figure flottante à droite, le texte l'entoure (écran large seulement) */
+@media (min-width: 768px) {
+  .figure-flottante, div.quarto-float:has(.figure-flottante), #fig-contraintes {
+    float: right; width: 42%; max-width: 440px; margin: 0 0 1rem 1.5rem;
+  }
+}
+/* Les encadrés passent toujours sous une figure flottante (pas de chevauchement) */
+.callout { clear: both; }
