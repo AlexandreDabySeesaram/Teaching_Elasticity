@@ -59,7 +59,9 @@ go.Figure.show = _show_multi
 from plotly.offline import get_plotlyjs
 display({"text/html": "<script>window.__define_sauve = window.define; window.define = undefined;</script>"
                       "<script type=\"text/javascript\">" + get_plotlyjs() + "</script>"
-                      "<script>window.define = window.__define_sauve;</script>"},
+                      "<script>window.define = window.__define_sauve;</script>",
+         # sortie vide pour le PDF (sinon « Unable to display output… »)
+         "text/markdown": ""},
         raw=True)
 
 pio.templates.default = "plotly_white"
@@ -69,6 +71,9 @@ COULEURS = ["#3746ff", "#ff808b", "#190f3c", "#9ba2ff"]
 
 *Notes manuscrites de la séance : [Elasticité_2026_10_22.pdf](Elasticité_2026_10_22.pdf).*
 
+::: {.content-visible when-format="pdf"}
+*Version en ligne du cours et autres ressources : <https://alexandredabyseesaram.github.io/>.*
+:::
 
 # Rappels de mécanique des milieux continus {#sec-rappels}
 

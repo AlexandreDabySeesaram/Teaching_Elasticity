@@ -39,6 +39,10 @@ format:
     embed-resources: false
     css: ensta.css
     fig-align: center
+    other-links:
+      - text: "Retour au site d'Alexandre Daby-Seesaram"
+        href: https://alexandredabyseesaram.github.io/
+        icon: house
     include-after-body:
       text: |
         <script>
