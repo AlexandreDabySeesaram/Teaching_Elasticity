@@ -172,6 +172,8 @@ qui **mesure la déformation volumique**.
 
 ## Contraintes {#sec-contraintes}
 
+![Coupure du solide $\Omega$ en deux parties : à travers l'élément de surface $dS$ de normale $\vv{n}$ (sortante de $\Omega^+$), $\Omega^-$ exerce sur $\Omega^+$ l'effort surfacique $\vv{T} = \sig\,\vv{n}$.](schema_contraintes){#fig-contraintes .figure-flottante width=100% fig-env="wrapfigdroite"}
+
 On a également introduit un objet décrivant les efforts à l'intérieur de la matière : le **tenseur des contraintes de Cauchy** $\sig$.
 
 Si l'on coupe le solide $\Omega$ en deux parties $\Omega^-$ et $\Omega^+$, les efforts surfaciques exercés par $\Omega^-$ sur $\Omega^+$ à travers un élément de surface $dS$ de normale $\vv{n}$ sont donnés par le **vecteur contrainte** (@fig-contraintes)
@@ -179,14 +181,21 @@ $$
 \vv{T} = \sig\,\vv{n}.
 $$
 
-![Coupure du solide $\Omega$ en deux parties : à travers l'élément de surface $dS$ de normale $\vv{n}$ (sortante de $\Omega^+$), $\Omega^-$ exerce sur $\Omega^+$ l'effort surfacique $\vv{T} = \sig\,\vv{n}$.](schema_contraintes){#fig-contraintes width=60%}
-
 L'**équilibre** (principe fondamental de la dynamique) donne
 $$
 \dive\sig + \vv{f}_v = \rho\,\vv{\gamma} \quad\text{dans } \Omega,
 \qquad
 \sig = \T\sig \quad\text{dans } \Omega .
 $$ {#eq-pfd}
+
+```{=latex}
+\wrapstuffclear
+```
+
+
+
+:::: {style='margin-top: 2em;'}
+::::
 
 ::: {.callout-note}
 ## Remarque : d'où vient l'équation locale ?

@@ -3,7 +3,7 @@ project:
   output-dir: public
   resources:
     - "Elasticité_2026_10_22.pdf"
-    
+
 lang: fr
 
 execute:
@@ -66,6 +66,9 @@ format:
       text: |
         \usepackage{amsmath,amssymb}
         \usepackage{xcolor}
+        % Figure habillée par le texte (wrapstuff : wrapfig est incompatible avec babel bidi)
+        \usepackage{wrapstuff}
+        \newenvironment{wrapfigdroite}[1][]{\wrapstuff[r,type=figure,width=0.4\textwidth]\captionsetup{font=small,format=plain,justification=raggedright,singlelinecheck=false}}{\endwrapstuff}
         \definecolor{enstableu}{HTML}{3746FF}
         \definecolor{enstanuit}{HTML}{190F3C}
         \definecolor{enstacorail}{HTML}{FF808B}
