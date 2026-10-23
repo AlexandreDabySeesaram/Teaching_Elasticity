@@ -279,7 +279,7 @@ fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.12,
 E_h, s0, k, n = 1.5, 1.5, 0.025, 3          # MPa, MPa, MPa, -
 eps_h = np.linspace(0, 6, 400)              # déformation (sans unité)
 sig_h = E_h * eps_h / (1 + (E_h * eps_h / s0)**n)**(1 / n) + k * eps_h**3
-eps_lin_h = 0.5                             # zone linéaire : petites déformations (HPP)
+eps_lin_h = 0.2                             # zone linéaire : petites déformations (HPP)
 
 def zone_lineaire(x1, y1, col):
     # Zone où la loi se confond avec sa tangente : cadre du cours
@@ -434,12 +434,13 @@ $$
 
 
 ```{=html}
-<div style="display:none"><span class="math inline">\(\definecolor{enstableu}{RGB}{55,70,255}\definecolor{enstacorailfonce}{RGB}{214,69,90}\newcommand{\isig}[1]{{\color{enstableu}{#1}}}\newcommand{\ieps}[1]{{\color{enstacorailfonce}{#1}}}\)</span></div>
+<div style="display:none"><span class="math inline">\(\definecolor{enstableu}{RGB}{55,70,255}\definecolor{enstacorailfonce}{RGB}{214,69,90}\newcommand{\isig}[1]{{\color{enstableu}{#1}}}\newcommand{\ieps}[1]{{\color{enstacorailfonce}{#1}}}\newcommand{\hl}[1]{{\color{enstacorailfonce}{#1}}}\)</span></div>
 ```
 
 ```{=latex}
 \newcommand{\isig}[1]{{\color{enstableu}#1}}
 \newcommand{\ieps}[1]{{\color{enstacorailfonce}#1}}
+\newcommand{\hl}[1]{{\color{enstacorailfonce}#1}}
 ```
 
 $\sig$ est linéaire en $\eps$. Cela signifie que chaque composante de $\sig$ est une combinaison linéaire des composantes de $\eps$ (indices liés à $\sig$ en $\isig{\text{bleu}}$, indices liés à $\eps$ en $\ieps{\text{corail}}$) :
@@ -533,7 +534,7 @@ C_{11} & C_{12} & \cdots & & & C_{16}\\
  & & & & & C_{66}
 \end{bmatrix}
 \underbrace{\begin{pmatrix}
-\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ 2\varepsilon_{23}\\ 2\varepsilon_{31}\\ 2\varepsilon_{12}
+\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ \hl{2}\varepsilon_{23}\\ \hl{2}\varepsilon_{31}\\ \hl{2}\varepsilon_{12}
 \end{pmatrix}}_{E}
 $$ {#eq-voigt}
 
@@ -545,7 +546,7 @@ Pour retenir l'ordre de Voigt, on parcourt la partie triangulaire supérieure de
 ![Ordre des composantes dans la notation de Voigt.](schema_voigt){#fig-ordre-voigt width=20%}
 :::
 
-Pourquoi des facteurs 2 ? Calculons l'énergie de déformation :
+Pourquoi des facteurs 2 ? Calculons le produit $\sig : \eps$, qui donne la **densité** d'énergie de déformation (énergie par unité de volume, $\wel = \tfrac{1}{2}\,\sig : \eps$) :
 $$
 \begin{aligned}
 \sig : \eps
@@ -561,12 +562,12 @@ $$
 \varepsilon_{13} & \varepsilon_{23} & \varepsilon_{33}
 \end{pmatrix}\\
 &= \sigma_{11}\varepsilon_{11} + \sigma_{22}\varepsilon_{22} + \sigma_{33}\varepsilon_{33}
-+ 2\,\sigma_{12}\varepsilon_{12} + 2\,\sigma_{13}\varepsilon_{13} + 2\,\sigma_{23}\varepsilon_{23}\\
++ \hl{2}\,\sigma_{12}\varepsilon_{12} + \hl{2}\,\sigma_{13}\varepsilon_{13} + \hl{2}\,\sigma_{23}\varepsilon_{23}\\
 &= \Sigma\cdot E .
 \end{aligned}
 $$
 
-L'énergie qui, avec les tenseurs, se calcule avec un produit doublement contracté, se calcule avec un **produit scalaire de vecteurs** en notation de Voigt.
+La densité d'énergie qui, avec les tenseurs, se calcule avec un produit doublement contracté, se calcule avec un **produit scalaire de vecteurs** en notation de Voigt.
 
 ### Notation de Kelvin–Voigt
 
@@ -578,7 +579,7 @@ Avec la notation de Voigt, le produit scalaire euclidien classique de deux vecte
 
 $$
 \begin{pmatrix}
-\sigma_{11}\\ \sigma_{22}\\ \sigma_{33}\\ \sqrt{2}\,\sigma_{23}\\ \sqrt{2}\,\sigma_{31}\\ \sqrt{2}\,\sigma_{12}
+\sigma_{11}\\ \sigma_{22}\\ \sigma_{33}\\ \hl{\sqrt{2}}\,\sigma_{23}\\ \hl{\sqrt{2}}\,\sigma_{31}\\ \hl{\sqrt{2}}\,\sigma_{12}
 \end{pmatrix}
 =
 \begin{bmatrix}
@@ -588,7 +589,7 @@ $$
  & & & \tilde{C}_{66}
 \end{bmatrix}
 \begin{pmatrix}
-\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ \sqrt{2}\,\varepsilon_{23}\\ \sqrt{2}\,\varepsilon_{31}\\ \sqrt{2}\,\varepsilon_{12}
+\varepsilon_{11}\\ \varepsilon_{22}\\ \varepsilon_{33}\\ \hl{\sqrt{2}}\,\varepsilon_{23}\\ \hl{\sqrt{2}}\,\varepsilon_{31}\\ \hl{\sqrt{2}}\,\varepsilon_{12}
 \end{pmatrix}
 $$ {#eq-kelvin-voigt}
 
