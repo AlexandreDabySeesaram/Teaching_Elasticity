@@ -267,23 +267,7 @@ $$
 $$
 :::
 
-Des exemples de tracés illustrant certains liens $\eps/\sig$ sont donnés dans les slides.
-
-Il existe une grande variété de comportements, et l'objet de ce cours est d'étudier l'**élasticité linéaire** :
-
-Élasticité
-: l'état de contrainte à un instant donné dépend **uniquement** de l'état de déformation à ce même instant (indépendamment de l'histoire du chargement et de la vitesse de chargement). Il n'y a pas de dissipation : le comportement est **réversible**.
-
-Linéaire
-: valide uniquement sous l'hypothèse HPP ; la relation reliant le tenseur des déformations linéarisé et le tenseur de Cauchy est **linéaire**.
-
-::: {.callout-note}
-## Élasticité n'implique pas linéarité
-
-Les deux hypothèses sont **indépendantes**. Un matériau peut être **élastique sans être linéaire** : c'est le cas des matériaux **hyperélastiques** (caoutchoucs, élastomères, tissus biologiques mous), qui subissent de grandes déformations réversibles. La contrainte dérive toujours d'un potentiel élastique (comportement réversible, sans dissipation), mais ce potentiel n'est plus quadratique : la relation contrainte–déformation est non linéaire. L'élasticité linéaire n'en est que l'approximation au premier ordre, au voisinage de l'état naturel et sous l'hypothèse HPP.
-:::
-
-La @fig-courbe-traction compare la loi élastique linéaire à deux lois non linéaires :
+Des exemples de tracés illustrant certains liens $\eps/\sig$ sont donnés en @fig-courbe-traction, qui compare la loi élastique linéaire à deux lois non linéaires :
 
 - une loi **hyperélastique** : élastique mais non linéaire (courbe en S typique des caoutchoucs), la décharge suit le même chemin que la charge ;
 - une loi **élastoplastique** : linéaire au début, puis non élastique au-delà d'un certain seuil, avec une déformation résiduelle $\varepsilon^p$ après décharge.
@@ -371,6 +355,22 @@ fig.update_yaxes(range=[0, 450], row=1, col=2)
 fig.update_layout(height=450, legend=dict(orientation="h", y=-0.25, x=0.5, xanchor="center"))
 fig.show()
 ```
+
+Il existe une grande variété de comportements, et l'objet de ce cours est d'étudier l'**élasticité linéaire** :
+
+Élasticité
+: l'état de contrainte à un instant donné dépend **uniquement** de l'état de déformation à ce même instant (indépendamment de l'histoire du chargement et de la vitesse de chargement). Il n'y a pas de dissipation : le comportement est **réversible**.
+
+Linéaire
+: valide uniquement sous l'hypothèse HPP ; la relation reliant le tenseur des déformations linéarisé et le tenseur de Cauchy est **linéaire**.
+
+::: {.callout-note}
+## Élasticité n'implique pas linéarité
+
+Les deux hypothèses sont **indépendantes**. Un matériau peut être **élastique sans être linéaire** : c'est le cas des matériaux **hyperélastiques** (caoutchoucs, élastomères, tissus biologiques mous), qui subissent de grandes déformations réversibles. La contrainte dérive toujours d'un potentiel élastique (comportement réversible, sans dissipation), mais ce potentiel n'est plus quadratique : la relation contrainte–déformation est non linéaire. L'élasticité linéaire n'en est que l'approximation au premier ordre, au voisinage de l'état naturel et sous l'hypothèse HPP.
+:::
+
+
 
 ## Potentiel élastique {#sec-potentiel}
 
