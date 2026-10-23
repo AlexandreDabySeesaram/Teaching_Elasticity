@@ -441,21 +441,31 @@ $$
 
 ## Tenseur d'élasticité {#sec-tenseur-C}
 
-$\sig$ est linéaire en $\eps$. Cela signifie que chaque composante de $\sig$ est une combinaison linéaire des composantes de $\eps$ :
+
+```{=html}
+<div style="display:none"><span class="math inline">\(\definecolor{enstableu}{RGB}{55,70,255}\definecolor{enstacorailfonce}{RGB}{214,69,90}\newcommand{\isig}[1]{{\color{enstableu}{#1}}}\newcommand{\ieps}[1]{{\color{enstacorailfonce}{#1}}}\)</span></div>
+```
+
+```{=latex}
+\newcommand{\isig}[1]{{\color{enstableu}#1}}
+\newcommand{\ieps}[1]{{\color{enstacorailfonce}#1}}
+```
+
+$\sig$ est linéaire en $\eps$. Cela signifie que chaque composante de $\sig$ est une combinaison linéaire des composantes de $\eps$ (indices liés à $\sig$ en $\isig{\text{bleu}}$, indices liés à $\eps$ en $\ieps{\text{corail}}$) :
 $$
 \begin{aligned}
-\sigma_{11} &= C_{1111}\,\varepsilon_{11} + C_{1112}\,\varepsilon_{12} + C_{1113}\,\varepsilon_{13} + \cdots\\
+\sigma_{\isig{11}} &= C_{\isig{11}\ieps{11}}\,\varepsilon_{\ieps{11}} + C_{\isig{11}\ieps{12}}\,\varepsilon_{\ieps{12}} + C_{\isig{11}\ieps{13}}\,\varepsilon_{\ieps{13}} + \cdots\\
 &\ \,\vdots\\
-\sigma_{33} &= C_{3313}\,\varepsilon_{13} + C_{3323}\,\varepsilon_{23} + C_{3333}\,\varepsilon_{33} + \cdots
+\sigma_{\isig{33}} &= C_{\isig{33}\ieps{13}}\,\varepsilon_{\ieps{13}} + C_{\isig{33}\ieps{23}}\,\varepsilon_{\ieps{23}} + C_{\isig{33}\ieps{33}}\,\varepsilon_{\ieps{33}} + \cdots
 \end{aligned}
 $$
 
 D'où l'introduction d'un **tenseur d'ordre 4** (quatre indices) $\Cel$, appelé **tenseur d'élasticité linéaire**, tel que
 $$
 \sig = \Cel : \eps
-\iff \sigma_{ij} = C_{ijkl}\,\varepsilon_{kl},
+\iff \sigma_{\isig{ij}} = C_{\isig{ij}\ieps{kl}}\,\varepsilon_{\ieps{kl}},
 \qquad\text{soit, par identification,}\quad
-C_{ijkl} = \frac{\partial \sigma_{ij}}{\partial \varepsilon_{kl}}.
+C_{\isig{ij}\ieps{kl}} = \frac{\partial \sigma_{\isig{ij}}}{\partial \varepsilon_{\ieps{kl}}}.
 $$ {#eq-hooke-general}
 
 ## Potentiel élastique linéaire {#sec-potentiel-lin}
