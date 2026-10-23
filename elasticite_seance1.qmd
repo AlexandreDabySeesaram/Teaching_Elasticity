@@ -1,8 +1,8 @@
 ---
 title: "Élasticité linéaire — Séance 1"
 subtitle: "Loi de comportement, élasticité linéaire isotrope et thermoélasticité"
-date: 2026-10-22
-date-format: "D MMMM YYYY"
+# date: 2026-10-22
+# date-format: "D MMMM YYYY"
 jupyter: python3
 ---
 
@@ -23,14 +23,8 @@ jupyter: python3
 ```{python}
 #| label: setup
 #| echo: false
-# Affichage des figures Plotly, valable pour toutes les sorties.
-# Chaque figure est émise avec plusieurs représentations, et Quarto choisit
-# celle qui convient au format en cours de rendu :
-# - HTML : la figure interactive (text/html, plotly.js intégré à la page
-#   avec la première figure) ;
-# - PDF  : la figure vectorielle (application/pdf, via `kaleido`).
-# On ne cherche donc pas à deviner le format de sortie (Quarto peut
-# réutiliser le même noyau Python pour le HTML puis le PDF).
+
+
 import base64
 
 import numpy as np
@@ -39,7 +33,6 @@ import plotly.io as pio
 from IPython.display import display
 
 try:
-    # kaleido 0.2.x : évite le cadre « Loading MathJax » sur la 1re figure
     pio.kaleido.scope.mathjax = None
 except Exception:
     pass
@@ -56,18 +49,13 @@ def _show_multi(self, *args, **kwargs):
                             height=self.layout.height or 450)
         sorties["application/pdf"] = base64.b64encode(pdf).decode()
     except Exception:
-        # Sans kaleido : une note remplace la figure dans le PDF
+        # Sans kaleido une note remplace la figure dans le PDF
         sorties["text/markdown"] = "*Figure interactive disponible dans la version HTML.*"
     display(sorties, raw=True)
 
 go.Figure.show = _show_multi
 
-# plotly.js est chargé une seule fois ici, en tête de page (HTML seulement),
-# plutôt qu'avec la première figure : Quarto 1.9 remonte en haut de la page
-# la sortie qui contient la bibliothèque, figure comprise.
-# Quarto peut aussi ajouter require.js à la page : plotly.js s'enregistrerait
-# alors comme module AMD et `Plotly` resterait indéfini (figures vides).
-# On masque donc `define` le temps de charger plotly.js.
+
 from plotly.offline import get_plotlyjs
 display({"text/html": "<script>window.__define_sauve = window.define; window.define = undefined;</script>"
                       "<script type=\"text/javascript\">" + get_plotlyjs() + "</script>"
@@ -78,6 +66,9 @@ pio.templates.default = "plotly_white"
 # Charte graphique ENSTA : bleu ENSTA, corail, bleu nuit, bleu ENSTA clair
 COULEURS = ["#3746ff", "#ff808b", "#190f3c", "#9ba2ff"]
 ```
+
+*Notes manuscrites de la séance : [Elasticité_2026_10_22.pdf](Elasticité_2026_10_22.pdf).*
+
 
 # Rappels de mécanique des milieux continus {#sec-rappels}
 
@@ -288,7 +279,7 @@ fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.12,
 E_h, s0, k, n = 1.5, 1.5, 0.025, 3          # MPa, MPa, MPa, -
 eps_h = np.linspace(0, 6, 400)              # déformation (sans unité)
 sig_h = E_h * eps_h / (1 + (E_h * eps_h / s0)**n)**(1 / n) + k * eps_h**3
-eps_lin_h = 0.1                             # zone linéaire : petites déformations (HPP)
+eps_lin_h = 0.5                             # zone linéaire : petites déformations (HPP)
 
 def zone_lineaire(x1, y1, col):
     # Zone où la loi se confond avec sa tangente : cadre du cours
