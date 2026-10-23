@@ -1,0 +1,12 @@
+/* Charte graphique ENSTA : bleu ENSTA #3746ff, bleu nuit #190f3c, corail #ff808b */
+body.quarto-light h1, body.quarto-light h2, body.quarto-light h3,
+body.quarto-light h4, body.quarto-light .title { color: #190f3c; }
+body.quarto-light h1.title, body.quarto-light h1 { border-bottom-color: #3746ff; }
+body.quarto-light .subtitle { color: #3746ff; }
+body.quarto-light a { color: #3746ff; }
+body.quarto-light a:hover { color: #ff808b; }
+body.quarto-light #TOC .nav-link.active,
+body.quarto-light .sidebar nav[role=doc-toc] ul > li > a.active { color: #3746ff; border-left-color: #3746ff; }
+body.quarto-dark a { color: #9ba2ff; }
+body.quarto-dark a:hover { color: #ff808b; }
+body.quarto-dark .subtitle { color: #9ba2ff; }
