@@ -4,8 +4,8 @@ jupyter: python3
 format:
   html:
     resources:
-      - "Elasticité_2026_10_22.pdf"
-      - "Elasticité_2026_11_06.pdf"
+      - "notes/elasticite_2026_10_22.pdf"
+      - "notes/elasticite_2026_11_06.pdf"
   pdf:
     output-file: elasticite.pdf
 ---

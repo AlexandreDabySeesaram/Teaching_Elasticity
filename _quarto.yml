@@ -2,7 +2,7 @@ project:
   title: "Élasticité linéaire"
   output-dir: public
   resources:
-    - "Elasticité_2026_10_22.pdf"
+    - "notes/elasticite_2026_10_22.pdf"
 
 lang: fr
 

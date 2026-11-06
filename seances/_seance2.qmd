@@ -1,4 +1,4 @@
-*Notes manuscrites de la séance : [Elasticité_2026_11_06.pdf](Elasticité_2026_11_06.pdf) (pages 23 et suivantes).*
+*Notes manuscrites de la séance : [elasticite_2026_11_06.pdf](notes/elasticite_2026_11_06.pdf) (pages 23 et suivantes).*
 
 
 ## Contrainte équivalente et surface seuil {#sec-critere}
