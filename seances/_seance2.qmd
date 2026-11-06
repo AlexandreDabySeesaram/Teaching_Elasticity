@@ -1,0 +1,630 @@
+*Notes manuscrites de la séance : [Elasticité_2026_11_06.pdf](Elasticité_2026_11_06.pdf) (pages 23 et suivantes).*
+
+
+## Contrainte équivalente et surface seuil {#sec-critere}
+
+La loi de comportement élastique linéaire n'est valable que dans un certain domaine : au-delà, le matériau sort de la zone linéaire (plasticité, endommagement, rupture…). On cherche donc un **critère de limite élastique** $C$ que l'on puisse confronter à l'état de contrainte $\sig$ :
+$$
+\sig \;\longleftrightarrow\; C .
+$$
+
+Or $\sig$ est un tenseur d'ordre 2 : il n'existe pas de relation d'ordre naturelle entre deux tenseurs, et l'on ne peut pas dire directement qu'un état de contrainte est « plus grand » qu'un autre. Pour disposer d'une relation d'ordre entre un critère de sortie de la zone linéaire et un état de contrainte donné, on introduit un **scalaire** mesurant cet état : la **contrainte équivalente** $\sigma_{\text{eq}}$.
+
+::: {.callout-important}
+### Définition : contrainte équivalente et surface seuil
+
+La **contrainte équivalente** $\sigma_{\text{eq}}(\sig)$ est un scalaire positif construit à partir de $\sig$. On reste dans le domaine élastique tant que
+$$
+\sigma_{\text{eq}}(\sig) < \sigma_y ,
+$$
+où $\sigma_y$ est la **limite d'élasticité** du matériau (mesurée en traction simple). L'ensemble des états de contrainte tels que $\sigma_{\text{eq}}(\sig) = \sigma_y$ forme la **surface seuil**.
+:::
+
+Il faut **choisir** une contrainte équivalente ; ce choix dépend du matériau. On note $\sigma_{\text{I}} \geq \sigma_{\text{II}} \geq \sigma_{\text{III}}$ les contraintes principales (valeurs propres de $\sig$). Les trois choix classiques sont :
+
+- **Rankine** (contrainte principale maximale) :
+$$
+\sigma_{\text{eq}}^{R} = \max\left(\sigma_{\text{I}}, \sigma_{\text{II}}, \sigma_{\text{III}}\right) ;
+$$
+- **Tresca** (cisaillement maximal) :
+$$
+\sigma_{\text{eq}}^{T} = \sup_{i,j}\,\left|\sigma_i - \sigma_j\right| ;
+$$
+- **von Mises** :
+$$
+\svm = \sqrt{\frac{1}{2}\left[\left(\sigma_{\text{I}} - \sigma_{\text{II}}\right)^2 + \left(\sigma_{\text{I}} - \sigma_{\text{III}}\right)^2 + \left(\sigma_{\text{II}} - \sigma_{\text{III}}\right)^2\right]}
+= \sqrt{\frac{3}{2}\,\sigD : \sigD} ,
+$$ {#eq-von-mises}
+où $\sigD = \sig - \frac{1}{3}\tr(\sig)\,\Id$ est le **déviateur** des contraintes.
+
+Ces trois contraintes équivalentes valent toutes $|\sigma_{11}|$ en traction simple $\sig = \sigma_{11}\,\vv{e}_1\otimes\vv{e}_1$ (pour Rankine, en traction $\sigma_{11} > 0$) : c'est ce qui permet de les comparer à la même limite $\sigma_y$.
+
+::: {.callout-note}
+### Sens physique de la contrainte de von Mises
+
+$\svm$ ne dépend que du **déviateur** $\sigD$ : elle est insensible à la partie sphérique $\frac{1}{3}\tr(\sig)\,\Id$, c'est-à-dire à une pression hydrostatique. On retrouve la décomposition sphérique / déviatorique de la séance précédente : la partie sphérique pilote la variation de volume (module $K$), la partie déviatorique la distorsion de forme (module $\mu$). Comme $\sigD = 2\mu\,\tsd{e}$, l'énergie élastique de distorsion vaut
+$$
+w_{\text{dist}} = \frac{1}{2}\,\sigD : \tsd{e} = \frac{1}{4\mu}\,\sigD : \sigD
+\qquad\Longrightarrow\qquad
+\svm^2 = 6\mu\,w_{\text{dist}} .
+$$
+Le critère de von Mises limite donc l'**énergie de distorsion** stockée dans le matériau : un métal ne plastifie pas sous pression hydrostatique pure, mais par glissement (cisaillement) de ses plans cristallins.
+:::
+
+Dans l'espace des contraintes principales $(\sigma_{\text{I}}, \sigma_{\text{II}}, \sigma_{\text{III}})$, la surface seuil de von Mises est un cylindre d'axe la trisectrice $\sigma_{\text{I}} = \sigma_{\text{II}} = \sigma_{\text{III}}$ (axe hydrostatique), celle de Tresca un prisme à base hexagonale de même axe. En **contraintes planes** ($\sigma_{\text{III}} = 0$), on coupe ces surfaces par le plan $(\sigma_{\text{I}}, \sigma_{\text{II}})$ : on obtient la représentation classique de la @fig-surfaces-seuil, avec un **carré** pour Rankine, un **hexagone** pour Tresca et une **ellipse** pour von Mises,
+$$
+\svm^2 = \sigma_{\text{I}}^2 - \sigma_{\text{I}}\,\sigma_{\text{II}} + \sigma_{\text{II}}^2 = \sigma_y^2 .
+$$
+(Dans cette figure, on n'impose pas $\sigma_{\text{I}} \geq \sigma_{\text{II}}$, et le critère de Rankine est appliqué aussi en compression : $|\sigma_i| \leq \sigma_y$.)
+
+```{python}
+#| label: fig-surfaces-seuil
+#| fig-cap: "Surfaces seuil en contraintes planes ($\\sigma_{\\text{III}} = 0$) dans le plan des contraintes principales, pour une même limite d'élasticité $\\sigma_y$ : carré de Rankine, hexagone de Tresca, ellipse de von Mises. Les trois critères coïncident en traction et compression simples ; ils diffèrent le plus en cisaillement pur ($\\sigma_{\\text{II}} = -\\sigma_{\\text{I}}$, en pointillés), où Tresca donne $\\tau = \\sigma_y/2$ et von Mises $\\tau = \\sigma_y/\\sqrt{3}$."
+sy = 1.0
+fig = go.Figure()
+# Rankine : carré |σ_I| <= σy, |σ_II| <= σy
+fig.add_trace(go.Scatter(x=[1, -1, -1, 1, 1], y=[1, 1, -1, -1, 1], mode="lines", name="Rankine",
+                         line=dict(color=COULEURS[2], width=3, dash="dash")))
+# Tresca : hexagone (σ_III = 0)
+fig.add_trace(go.Scatter(x=[1, 1, 0, -1, -1, 0, 1], y=[0, 1, 1, 0, -1, -1, 0], mode="lines",
+                         name="Tresca", line=dict(color=CORAIL_FONCE, width=3)))
+# von Mises : ellipse σ1² − σ1σ2 + σ2² = σy² (axes à 45°, demi-axes √2 σy et √(2/3) σy)
+t = np.linspace(0, 2 * np.pi, 400)
+a, b = np.sqrt(2) * sy, np.sqrt(2 / 3) * sy
+u, v = a * np.cos(t), b * np.sin(t)
+fig.add_trace(go.Scatter(x=(u - v) / np.sqrt(2), y=(u + v) / np.sqrt(2), mode="lines",
+                         name="von Mises", line=dict(color=COULEURS[0], width=3)))
+# Chemin de cisaillement pur
+fig.add_trace(go.Scatter(x=[-1.5, 1.5], y=[1.5, -1.5], mode="lines", name="cisaillement pur",
+                         line=dict(color="grey", width=1.5, dash="dot")))
+fig.add_trace(go.Scatter(x=[0.5, 1 / np.sqrt(3)], y=[-0.5, -1 / np.sqrt(3)], mode="markers",
+                         name="limite en cisaillement (Tresca, von Mises)",
+                         marker=dict(size=10, color=[CORAIL_FONCE, COULEURS[0]],
+                                     line=dict(color=COULEURS[2], width=1))))
+fig.add_trace(go.Scatter(x=[1, 0, -1, 0], y=[0, 1, 0, -1], mode="markers", name="traction / compression simples",
+                         marker=dict(size=10, color=COULEURS[1], line=dict(color=COULEURS[2], width=1))))
+fig.update_layout(
+    xaxis=dict(title="σ_I / σ_y", range=[-1.6, 1.6], scaleanchor="y", zeroline=True,
+               zerolinecolor="grey", dtick=0.5),
+    yaxis=dict(title="σ_II / σ_y", range=[-1.6, 1.6], zeroline=True, zerolinecolor="grey", dtick=0.5),
+    height=560, legend=dict(x=1.02, y=1, xanchor="left", yanchor="top",
+                            bgcolor="rgba(255,255,255,0.7)"),
+    margin=dict(l=40, r=20, t=20, b=40),
+)
+fig.show()
+```
+
+::: {.callout-note}
+### Remarque
+
+À limite $\sigma_y$ identique en traction, le critère de Tresca est plus sévère que celui de von Mises : en cisaillement pur, il prédit la plastification pour $\tau = \sigma_y/2$, contre $\tau = \sigma_y/\sqrt{3} \approx 0{,}577\,\sigma_y$ pour von Mises.
+:::
+
+## Techniques de résolution analytique {#sec-resolution}
+
+### Rappel : le problème d'élasticité {#sec-rappel-pb}
+
+On étudie des solides qui se déforment sous l'action de sollicitations extérieures, ces dernières induisant également des contraintes dans la structure.
+
+::: {.callout-warning}
+### Hypothèses
+
+- petites perturbations (HPP) ;
+- élasticité linéaire isotrope ;
+- évolution quasi-statique ;
+- évolution isotherme.
+:::
+
+Dans ce cas, l'équilibre est donné par
+$$
+\forall \vv{x} \in \Omega, \qquad \dive\sig + \vv{f}_v = \vv{0} .
+$$
+
+#### Bilan des équations {#sec-bilan-equations}
+
+::: {.callout-important}
+### Équations du problème d'élasticité linéaire
+
+- **Équilibre** : $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, avec $\sig = \T\sig$.
+- **Comportement** (loi de Hooke) :
+$$
+\sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id
+\qquad\Longleftrightarrow\qquad
+\eps = \frac{1+\nu}{E}\,\sig - \frac{\nu}{E}\,\tr(\sig)\,\Id .
+$$
+- **Compatibilité** : $\eps = \frac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right)$.
+- **Conditions aux limites** :
+$$
+\forall \vv{x} \in \partial\Omega_u, \quad \vv{u}(\vv{x}) = \vv{u}_d ,
+\qquad\qquad
+\forall \vv{x} \in \partial\Omega_f, \quad \sig(\vv{x})\,\vv{n} = \vv{f}_s .
+$$
+:::
+
+### Admissibilité et unicité {#sec-admissibilite}
+
+::: {.callout-important}
+### Définition : champs admissibles
+
+- Un champ de contrainte $\sig$ est dit **statiquement admissible** (SA) si et seulement s'il vérifie les équations d'équilibre et les conditions aux limites en effort.
+- De même, un champ de déplacement $\vv{u}$ est dit **cinématiquement admissible** (CA) si et seulement s'il vérifie les conditions aux limites en déplacement. La déformation doit alors être compatible : $\eps = \tsd{\nabla}_{\text{sym}}\vv{u}$.
+:::
+
+**Unicité.** Si l'on trouve un champ de contrainte SA associé (par la loi de comportement) à un champ de déplacement CA, il s'agit d'**une** solution du problème. Le champ de contrainte solution est unique, mais le déplacement ne l'est pas forcément : il peut être défini à un déplacement de solide rigide près lorsque les conditions aux limites en déplacement ne suffisent pas à bloquer ces mouvements (cf. la section énergétique du cours).
+
+### Théorème de superposition {#sec-superposition}
+
+Du fait de la linéarité des problèmes traités :
+
+::: {.callout-important}
+### Théorème de superposition
+
+Si un corps $\Omega$, soumis à des déplacements imposés $\vv{u}_d^{(1)}$, des efforts volumiques $\vv{f}_v^{(1)}$ et surfaciques $\vv{f}_s^{(1)}$, admet pour solution un champ de déplacement $\vv{u}^{(1)}$, un champ de déformation $\eps^{(1)}$ et un champ de contrainte $\sig^{(1)}$, et que ce même solide, soumis à $\vv{u}_d^{(2)}$, $\vv{f}_v^{(2)}$ et $\vv{f}_s^{(2)}$, admet pour solution $\vv{u}^{(2)}$, $\eps^{(2)}$ et $\sig^{(2)}$, alors, pour tout $(\lambda_1, \lambda_2) \in \mathbb{R}^2$, ce corps soumis à
+$$
+\lambda_1\vv{u}_d^{(1)} + \lambda_2\vv{u}_d^{(2)}, \qquad
+\lambda_1\vv{f}_s^{(1)} + \lambda_2\vv{f}_s^{(2)}, \qquad
+\lambda_1\vv{f}_v^{(1)} + \lambda_2\vv{f}_v^{(2)}
+$$
+admet pour solution
+$$
+\lambda_1\vv{u}^{(1)} + \lambda_2\vv{u}^{(2)}, \qquad
+\lambda_1\eps^{(1)} + \lambda_2\eps^{(2)}, \qquad
+\lambda_1\sig^{(1)} + \lambda_2\sig^{(2)} .
+$$
+:::
+
+### Approche en déplacement {#sec-approche-deplacement}
+
+On résume ici la méthode à suivre pour résoudre un problème de mécanique de milieux continu en élasticité linéaire dans le cas où il serait plus simple d'intuiter une forme plausible de déplacement.
+
+::: {.callout-important}
+### Méthode - approche en déplacement
+1. Postuler un champ de déplacement $\vv{u}$ (en s'aidant des symétries du problème).
+2. Calculer le champ de déformation linéarisée $\eps$ correspondant.
+3. Utiliser la loi de comportement pour calculer le champ de contrainte $\sig$.
+4. L'injecter dans les équations d'équilibre et résoudre l'équation différentielle obtenue.
+5. Utiliser les conditions aux limites pour déterminer les constantes d'intégration.
+:::
+
+
+### Équation de Navier {#sec-navier}
+
+Les équations de compatibilité, d'équilibre et la loi de Hooke, dans le cas élastique linéaire isotrope,
+$$
+\left\{
+\begin{aligned}
+&\dive\sig + \vv{f}_v = \vv{0} && (1)\\
+&\sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id && (2)\\
+&\eps = \tfrac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right) && (3)
+\end{aligned}
+\right.
+$$
+peuvent être combinées en une unique équation portant sur le déplacement, l'**équation de Navier** :
+
+::: {.callout-important}
+### Équation de Navier
+$$
+\forall \vv{x} \in \Omega, \qquad
+(\lambda + \mu)\,\vv{\nabla}\left(\dive\vv{u}\right) + \mu\,\Delta\vv{u} + \vv{f}_v = \vv{0} .
+$$ {#eq-navier}
+:::
+
+::: {.callout-note collapse="false"}
+### Démonstration (en notation d'Einstein)
+
+Profitons de cette démonstration pour nous exercer à la notation d'Einstein (sommation sur les indices répétés, la virgule désignant la dérivation : $u_{i,j} = \partial u_i / \partial x_j$).
+
+**(2) ⇒** par linéarité de la divergence,
+$$
+\dive\sig = \dive\left(2\mu\,\eps + \lambda\,\tr(\eps)\,\Id\right) = 2\mu\,\dive\eps + \lambda\,\dive\left(\tr(\eps)\,\Id\right).
+$$
+
+*Lemme.* Soient $f$ un champ scalaire et $\tsd{T}$ un champ de tenseurs d'ordre 2 :
+$$
+\dive\left(f\,\tsd{T}\right) = \left(f\,T_{ij}\right)_{,j}
+= \underbrace{f_{,j}\,T_{ij}}_{\tsd{T}\,\vv{\nabla} f} + \underbrace{f\,T_{ij,j}}_{f\,\dive\tsd{T}} .
+$$
+D'où
+$$
+\dive\left(\tr(\eps)\,\Id\right) = \Id\,\vv{\nabla}\left(\tr\eps\right) = \vv{\nabla}\left(\tr\eps\right),
+\qquad\text{soit}\qquad
+\dive\sig = 2\mu\,\dive\eps + \lambda\,\vv{\nabla}\left(\tr\eps\right).
+$$
+
+**(3) ⇒**
+
+- $\tr\eps = \frac{1}{2}\left(u_{i,i} + u_{j,j}\right) = u_{i,i} = \dive\vv{u}$ ;
+- $\left(\dive\eps\right)_i = \varepsilon_{ij,j} = \frac{1}{2}\left(u_{i,j} + u_{j,i}\right)_{,j} = \frac{1}{2}\left(u_{i,jj} + u_{j,ij}\right)$, or
+  - $u_{i,jj} = \left(\Delta\vv{u}\right)_i$,
+  - $u_{j,ij} = u_{j,ji} = \left(u_{j,j}\right)_{,i} = \left(\vv{\nabla}\left(\dive\vv{u}\right)\right)_i$.
+
+Soit
+$$
+\dive\sig = 2\mu\left[\frac{1}{2}\left(\Delta\vv{u} + \vv{\nabla}\left(\dive\vv{u}\right)\right)\right] + \lambda\,\vv{\nabla}\left(\dive\vv{u}\right). \qquad (4)
+$$
+
+**Finalement**, (1) et (4) donnent
+$$
+2\mu\left[\frac{1}{2}\left(\Delta\vv{u} + \vv{\nabla}\left(\dive\vv{u}\right)\right)\right] + \lambda\,\vv{\nabla}\left(\dive\vv{u}\right) + \vv{f}_v = \vv{0}
+\quad\Longrightarrow\quad
+\boxed{\mu\,\Delta\vv{u} + (\lambda + \mu)\,\vv{\nabla}\left(\dive\vv{u}\right) + \vv{f}_v = \vv{0}.}
+$$
+:::
+
+
+## TD 1 — Torsion d'un barreau cylindrique {#sec-torsion}
+
+::: {.callout-caution icon=false}
+### Énoncé
+
+![Barreau cylindrique encastré en $z = 0$ et soumis à un couple $C\,\vv{e}_z$ sur sa face supérieure.](figures/schema_torsion){#fig-torsion width=45%}
+
+Un barreau cylindrique d'axe $(O, \vv{e}_z)$, de rayon $R$ et de hauteur $h$, est constitué d'un matériau élastique linéaire isotrope (coefficients de Lamé $\lambda$, $\mu$). Sa base $S_0$ ($z = 0$) est encastrée, sa surface latérale $S_\ell$ est libre d'effort, et sa face supérieure $S_h$ ($z = h$) est soumise à des efforts de résultante nulle et de moment $C\,\vv{e}_z$ en $O$ (@fig-torsion). On néglige les efforts volumiques.
+
+1. Écrire les conditions aux limites.
+2. On suppose que chaque section droite tourne en bloc d'un petit angle $\varphi(z)$ autour de $\vv{e}_z$. Montrer que $\vv{u} = r\,\varphi(z)\,\vv{e}_\theta$.
+3. *(Question supprimée pour utiliser l'approche en déplacement sans Navier)*
+4. Calculer le tenseur des déformations $\eps$.
+5. Calculer le tenseur des contraintes $\sig$ et vérifier la condition aux limites sur $S_\ell$.
+6. Injecter $\sig$ dans l'équation d'équilibre et en déduire $\varphi(z)$, en tenant compte de la condition aux limites sur $S_0$.
+7. Exploiter les conditions aux limites sur $S_h$ pour relier la constante obtenue au couple $C$.
+8. Diagonaliser le tenseur des contraintes.
+9. Calculer la contrainte de von Mises et en déduire le couple maximal admissible pour une limite d'élasticité $\sigma_y$.
+:::
+
+::: {.callout-caution collapse="true" icon=false}
+### Correction
+
+**1.** Sur $S_\ell$ : $\sig(R, \theta, z)\,\vv{e}_r = \vv{0}$. Sur $S_0$ : $\vv{u}(r, \theta, 0) = \vv{0}$.
+
+Sur $S_h$, on ne connaît que le torseur des efforts (résultante et moment) :
+$$
+\vv{R} = \iint_{S_h} \sig(r, \theta, h)\,\vv{e}_z \,\mathrm{d}S = \vv{0},
+\qquad
+\iint_{S_h} \vv{OM} \wedge \left(\sig(r, \theta, h)\,\vv{e}_z\right) \mathrm{d}S = C\,\vv{e}_z .
+$$
+
+**2.** Un point $M(r, \theta, z)$ se déplace, après une rotation $\varphi$, en $M'(r, \theta + \varphi(z), z)$, d'où
+$$
+\vv{u} = \vv{OM'} - \vv{OM} = r\,\vv{e}_r(\theta + \varphi) - r\,\vv{e}_r(\theta).
+$$
+Avec $\vv{e}_r(\theta) = \cos\theta\,\vv{e}_x + \sin\theta\,\vv{e}_y$ et $\vv{e}_\theta(\theta) = \cos\theta\,\vv{e}_y - \sin\theta\,\vv{e}_x$ :
+$$
+\vv{e}_r(\theta + \varphi) = \left(\cos\theta\cos\varphi - \sin\theta\sin\varphi\right)\vv{e}_x + \left(\sin\theta\cos\varphi + \sin\varphi\cos\theta\right)\vv{e}_y ,
+$$
+d'où
+$$
+\vv{u} = r\Big[\underbrace{(\cos\varphi - 1)}_{\simeq\, 0}\,\vv{e}_r(\theta) + \underbrace{\sin\varphi}_{\simeq\, \varphi}\,\vv{e}_\theta(\theta)\Big]
+\simeq r\,\varphi\,\vv{e}_\theta ,
+\qquad\text{soit}\qquad
+\boxed{\vv{u} = \varphi(z)\,r\,\vv{e}_\theta .}
+$$
+
+**4.** Avec le gradient en cylindriques ($u_\theta = r\varphi(z)$, $u_r = u_z = 0$) :
+$$
+\tsd{\nabla}\vv{u} =
+\begin{pmatrix} 0 & -\varphi & 0\\ \varphi & 0 & r\varphi'\\ 0 & 0 & 0 \end{pmatrix}
+\quad\Longrightarrow\quad
+\eps = \frac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right) =
+\begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \frac{1}{2}r\varphi'\\ 0 & \frac{1}{2}r\varphi' & 0 \end{pmatrix}_{(\vv{e}_r, \vv{e}_\theta, \vv{e}_z)} .
+$$
+
+**5.** $\tr\eps = 0$, donc
+$$
+\sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id =
+\begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \mu r\varphi'\\ 0 & \mu r\varphi' & 0 \end{pmatrix}.
+$$
+On note que $\sig\,\vv{e}_r = \vv{0}$ sur $S_\ell$ : la condition aux limites sur $S_\ell$ est vérifiée.
+
+**6.** L'équilibre $\dive\sig = \vv{0}$ donne
+$$
+\begin{pmatrix} 0\\ \mu r\varphi''\\ 0 \end{pmatrix} = \vv{0}
+\quad\Longrightarrow\quad \varphi'' = 0 .
+$$
+Soit $\varphi' = \alpha$, d'où $\boxed{\varphi(z) = \alpha z + \beta}$.
+
+*Détermination des constantes d'intégration à l'aide des CL.* Or $\vv{u}(z = 0) = \vv{0}$, d'où $\beta = 0$. On a donc :
+$$
+\vv{u} = r\,\alpha\,z\,\vv{e}_\theta ,
+\qquad
+\eps = \begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \frac{1}{2}r\alpha\\ 0 & \frac{1}{2}r\alpha & 0 \end{pmatrix},
+\qquad
+\sig = \begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \mu r\alpha\\ 0 & \mu r\alpha & 0 \end{pmatrix}.
+$$
+
+**7.** Sur $S_h$, le vecteur contrainte vaut $\vv{T} = \sig(r, \theta, h)\,\vv{e}_z = \mu r\alpha\,\vv{e}_\theta$. Sa résultante est
+$$
+\vv{R} = \iint_{S_h} \mu r\alpha\,\vv{e}_\theta\; r\,\mathrm{d}\theta\,\mathrm{d}r
+= \mu\alpha \int_0^R r^2\,\mathrm{d}r \int_0^{2\pi} \vv{e}_\theta\,\mathrm{d}\theta = \vv{0},
+$$
+et son moment en $O$
+$$
+\vv{\mathcal{M}} = \iint_{S_h} \vv{OM} \wedge \vv{T}\,\mathrm{d}S
+= \iint r\,\vv{e}_r \wedge \mu\alpha r\,\vv{e}_\theta\; r\,\mathrm{d}\theta\,\mathrm{d}r
+= \mu\alpha \int_0^R r^3\,\mathrm{d}r \int_0^{2\pi} \mathrm{d}\theta\;\vv{e}_z
+= \mu\alpha\,\frac{\pi R^4}{2}\,\vv{e}_z
+$$
+(la composante $h\,\vv{e}_z \wedge \vv{T}$ de $\vv{OM} = r\,\vv{e}_r + h\,\vv{e}_z$ s'intègre à zéro, comme $\vv{R}$). Or $\vv{\mathcal{M}} = C\,\vv{e}_z$, d'où
+$$
+\boxed{\alpha = \frac{2C}{\mu\pi R^4}.}
+$$
+
+**8.** Diagonalisation du tenseur des contraintes, en notant $\tau = \mu r\alpha$ :
+$$
+\det\left(\sig - \lambda\Id\right) =
+\begin{vmatrix} -\lambda & 0 & 0\\ 0 & -\lambda & \tau\\ 0 & \tau & -\lambda \end{vmatrix}
+= -\lambda\left(\lambda^2 - \tau^2\right) = 0 .
+$$
+Les valeurs propres sont $0$, $\tau$ et $-\tau$, que l'on ordonne :
+$$
+\sigma_{\text{I}} = \tau, \qquad \sigma_{\text{II}} = 0, \qquad \sigma_{\text{III}} = -\tau .
+$$
+
+*Directions propres associées* ($\sig\,\vv{v} = \lambda\,\vv{v}$) :
+
+- $\sigma_{\text{II}}$ : $\vv{v}_{\text{II}} = \vv{e}_r$ ;
+- $\sigma_{\text{I}}$ : $\tau v_r = 0$ et $\tau v_\theta = \tau v_z$, soit $v_r = 0$, $v_\theta = v_z$ ; avec $\|\vv{v}\| = 1$, $2A^2 = 1$, d'où
+$\vv{v}_{\text{I}} = \frac{1}{\sqrt{2}}\left(\vv{e}_\theta + \vv{e}_z\right)$ ;
+- $\sigma_{\text{III}}$ : $v_r = 0$, $v_\theta = -v_z$, d'où $\vv{v}_{\text{III}} = \frac{1}{\sqrt{2}}\left(-\vv{e}_\theta + \vv{e}_z\right)$.
+
+Les directions principales non triviales sont à 45° de l'axe : c'est pourquoi une craie (matériau fragile, rompant en traction) cassée en torsion présente une surface de rupture en hélice à 45°.
+
+**9.** $\tr\sig = 0$, donc $\sigD = \sig$ et
+$$
+\svm = \sqrt{\frac{3}{2}\,\sigD : \sigD}
+= \sqrt{\frac{3}{2}\,\tr\begin{pmatrix} 0 & 0 & 0\\ 0 & \tau^2 & 0\\ 0 & 0 & \tau^2 \end{pmatrix}}
+= \sqrt{\frac{3}{2}\times 2\tau^2} = \sqrt{3}\,\tau .
+$$
+$\tau = \mu\alpha r$ est maximal en $r = R$ ; on reste élastique partout si
+$$
+\sqrt{3}\,\mu\alpha R \leq \sigma_y
+\quad\Longleftrightarrow\quad
+\alpha \leq \frac{\sigma_y}{\sqrt{3}\,\mu R} .
+$$
+Or $C = \dfrac{\pi\mu\alpha R^4}{2}$, d'où
+$$
+\boxed{C_{\max} = \frac{\pi R^3\,\sigma_y}{2\sqrt{3}}.}
+$$
+:::
+
+
+
+## TD 1 — Dimensionnement d'un réservoir sous pression {#sec-reservoir}
+
+::: {.callout-caution icon=false}
+### Énoncé
+
+![Réservoir cylindrique : coupe transversale (à gauche) et coupe longitudinale (à droite). Les fonds (en tirets) ne font pas partie du domaine étudié ; ils transmettent au tube l'effort axial $\pm\vv{f}$.](figures/schema_reservoir){#fig-reservoir width=85%}
+
+Un réservoir est constitué d'un tube épais d'axe $\vv{e}_z$, de rayon intérieur $R_i$ et de rayon extérieur $R_e$, occupant $-h \leq z \leq h$, fermé par deux fonds (@fig-reservoir). Il contient un fluide à la pression $p_i$ ; la pression extérieure est négligée. Le matériau est élastique linéaire isotrope ($\lambda$, $\mu$) et on néglige les efforts volumiques. Les fonds transmettent au tube, sur ses sections extrêmes $z = \pm h$, une densité surfacique d'effort uniforme $\pm\vv{f}$.
+
+1. Écrire les conditions aux limites sur le tube.
+2. En isolant un fond du réservoir, déterminer $\vv{f}$.
+3. Utiliser les symétries du problème pour simplifier la forme du champ de déplacement.
+4. À l'aide de l'équation de Navier, déterminer le champ de déplacement.
+5. Calculer le tenseur des déformations.
+6. Calculer le tenseur des contraintes.
+7. Déterminer les constantes d'intégration à l'aide des conditions aux limites.
+:::
+
+::: {.callout-caution collapse="true" icon=false}
+### Correction
+
+**1.**
+$$
+\left\{
+\begin{aligned}
+&\sig(R_i, \theta, z)\,(-\vv{e}_r) = p_i\,\vv{e}_r ,\\
+&\sig(R_e, \theta, z)\,\vv{e}_r = \vv{0} ,\\
+&\sig(r, \theta, h)\,\vv{e}_z = \vv{f} ,\\
+&\sig(r, \theta, -h)\,(-\vv{e}_z) = -\vv{f} .
+\end{aligned}
+\right.
+$$
+
+**2.** On isole le fond du réservoir : il est soumis à la pression $p_i$ sur le disque de rayon $R_i$, et à l'action du tube sur la couronne $R_i \leq r \leq R_e$. Son équilibre donne
+$$
+\int_0^{2\pi}\!\!\int_{R_i}^{R_e} \vv{f}\;r\,\mathrm{d}r\,\mathrm{d}\theta - p_i\,\pi R_i^2\,\vv{e}_z = \vv{0}
+\quad\Longrightarrow\quad
+\vv{f}\,\frac{R_e^2 - R_i^2}{2}\,2\pi = p_i\,\pi R_i^2\,\vv{e}_z
+\quad\Longrightarrow\quad
+\boxed{\vv{f} = p_i\,\frac{R_i^2}{R_e^2 - R_i^2}\,\vv{e}_z .}
+$$
+
+::: {.callout-note}
+### Remarque : calcul de la résultante des forces de pression
+
+![Fluide à la pression uniforme $p$ occupant le domaine $\Omega$, délimité par la surface plane $\partial\Omega_1$ (disque de rayon $R$) et la surface $\partial\Omega_2$, de forme quelconque (fond du réservoir). La normale $\vv{n}$ est la normale sortante de la paroi : elle pointe vers le fluide, et $-p\,\vv{n}\,\mathrm{d}S$ est l'effort exercé par le fluide sur la paroi.](figures/schema_pression){#fig-pression width=50%}
+
+En statique, la résultante des forces d'une pression **uniforme** $p$ sur une surface **fermée** est nulle. Pour la frontière $\partial\Omega = \partial\Omega_1 \cup \partial\Omega_2$ du domaine fluide, avec $\vv{n}$ orientée vers le fluide comme sur la @fig-pression :
+$$
+\iint_{\partial\Omega} -p\,\vv{n}\,\mathrm{d}S = \vv{0}
+\qquad\Bigl(\text{car } \iint_{\partial\Omega} \vv{n}\,\mathrm{d}S = -\iiint_{\Omega} \vv{\nabla}(1)\,\mathrm{d}V = \vv{0}\Bigr).
+$$
+On peut alors trivialiser le calcul de la résultante sur une surface compliquée (ici $\partial\Omega_2$, le fond bombé du réservoir) en remarquant que
+$$
+\iint_{\partial\Omega_2} -p\,\vv{n}\,\mathrm{d}S = -\iint_{\partial\Omega_1} -p\,\vv{n}\,\mathrm{d}S ,
+$$
+où $\partial\Omega_1$ est la surface plane qui « ferme » $\partial\Omega_2$ : le disque de rayon $R$, sur lequel $\vv{n} = -\vv{e}_z$. D'où
+$$
+\iint_{\partial\Omega_1} -p\,\vv{n}\,\mathrm{d}S = \iint_{\partial\Omega_1} p\,\mathrm{d}S\;\vv{e}_z = p\,\pi R^2\,\vv{e}_z ,
+\qquad
+\iint_{\partial\Omega_2} -p\,\vv{n}\,\mathrm{d}S = -p\,\pi R^2\,\vv{e}_z ,
+$$
+quelle que soit la forme du fond : c'est l'effort du fluide sur le fond, qui donne le terme $-p_i\,\pi R_i^2\,\vv{e}_z$ de l'équilibre ci-dessus.
+:::
+
+**3.** Par symétrie de révolution, $u_\theta = 0$ et $\dfrac{\partial}{\partial\theta} = 0$, d'où $\vv{u} = u_r(r, z)\,\vv{e}_r + u_z(r, z)\,\vv{e}_z$.
+
+::: {.callout-warning}
+### Attention : ici, ce n'est pas si simple
+
+La symétrie seule ne suffit pas : on suppose en plus que **$\eps$ est invariant par translation selon $z$** (loin des fonds, toutes les sections droites sont dans le même état), ce qui conduit à
+$$
+\vv{u} = u_r(r)\,\vv{e}_r + u_z(z)\,\vv{e}_z .
+$$
+:::
+
+**4.** En l'absence de forces de volume et en quasi-statique, l'équation de Navier s'écrit
+$$
+(\lambda + \mu)\,\vv{\nabla}\left(\dive\vv{u}\right) + \mu\,\Delta\vv{u} = \vv{0}.
+$$
+Ici,
+$$
+\dive\vv{u} = \frac{1}{r}\frac{\partial (r\,u_r)}{\partial r} + \frac{1}{r}\frac{\partial u_\theta}{\partial\theta} + \frac{\partial u_z}{\partial z}
+= u_r'(r) + \frac{u_r}{r} + u_z'(z),
+$$
+$$
+\vv{\nabla}\left(\dive\vv{u}\right) = \frac{\partial}{\partial r}\left(u_r' + \frac{u_r}{r} + u_z'\right)\vv{e}_r + u_z''(z)\,\vv{e}_z
+= \left(u_r'' + \frac{u_r'}{r} - \frac{u_r}{r^2}\right)\vv{e}_r + u_z''(z)\,\vv{e}_z ,
+$$
+$$
+\Delta\vv{u} = \left(u_r'' + \frac{u_r'}{r} - \frac{u_r}{r^2}\right)\vv{e}_r + u_z''\,\vv{e}_z .
+$$
+Soit, avec Navier,
+$$
+(\lambda + 2\mu)
+\begin{pmatrix}
+u_r''(r) + \dfrac{u_r'(r)}{r} - \dfrac{u_r(r)}{r^2}\\[1ex]
+0\\
+u_z''(z)
+\end{pmatrix} = \vv{0}.
+$$
+
+- Sur $u_z$ : $u_z''(z) = 0 \Rightarrow u_z = Az + B$. La constante $B$ est une simple translation selon l'axe : on peut prendre $B = 0$.
+- Sur $u_r$ : $u_r'' + \dfrac{u_r'}{r} - \dfrac{u_r}{r^2} = 0 \iff r^2 u_r'' + r\,u_r' - u_r = 0$ (équation d'Euler). On cherche $u_r$ sous la forme $r^m$ :
+$$
+r^2\,m(m-1)\,r^{m-2} + r\,m\,r^{m-1} - r^m = 0
+\;\Longrightarrow\; \left(m(m-1) + m - 1\right) r^m = 0
+\;\Longrightarrow\; m^2 - 1 = 0
+\;\Longrightarrow\; m = \pm 1 .
+$$
+D'où $u_r = C\,r + \dfrac{D}{r}$, soit
+$$
+\boxed{\vv{u} = \left(C\,r + \frac{D}{r}\right)\vv{e}_r + A\,z\,\vv{e}_z .}
+$$
+
+**5.**
+$$
+\eps =
+\begin{pmatrix} u_{r,r} & 0 & 0\\ 0 & \dfrac{u_r}{r} & 0\\ 0 & 0 & u_{z,z} \end{pmatrix}
+=
+\begin{pmatrix} C - \dfrac{D}{r^2} & 0 & 0\\ 0 & C + \dfrac{D}{r^2} & 0\\ 0 & 0 & A \end{pmatrix}.
+$$
+
+**6.** $\sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id$ avec $\tr\eps = 2C + A$ :
+$$
+\sig =
+\begin{pmatrix}
+2\mu\left(C - \dfrac{D}{r^2}\right) + \lambda(2C + A) & 0 & 0\\
+0 & 2\mu\left(C + \dfrac{D}{r^2}\right) + \lambda(2C + A) & 0\\
+0 & 0 & 2\mu A + \lambda(2C + A)
+\end{pmatrix}.
+$$
+
+**7.** Les conditions aux limites donnent
+$$
+\left\{
+\begin{aligned}
+&2\mu\left(C - \frac{D}{R_i^2}\right) + \lambda(2C + A) = -p_i && (1)\\
+&2\mu\left(C - \frac{D}{R_e^2}\right) + \lambda(2C + A) = 0 && (2)\\
+&2\mu A + \lambda(2C + A) = p_i\,\frac{R_i^2}{R_e^2 - R_i^2} && (3)
+\end{aligned}
+\right.
+$$
+
+- $(1) - (2)$ : $2\mu D\left(\dfrac{1}{R_e^2} - \dfrac{1}{R_i^2}\right) = -p_i$ ;
+- $R_i^2 \times (1) - R_e^2 \times (2)$ : $2\mu C\left(R_i^2 - R_e^2\right) + \lambda(2C + A)\left(R_i^2 - R_e^2\right) = -p_i R_i^2$ ;
+- $R_i^2 \times (1) - R_e^2 \times (2) - \left(R_i^2 - R_e^2\right) \times (3)$ : $2\mu\,(C - A)\left(R_i^2 - R_e^2\right) = 0$.
+
+D'où
+$$
+\left\{
+\begin{aligned}
+&C = A ,\\
+&(2\mu + 3\lambda)\,C = p_i\,\frac{R_i^2}{R_e^2 - R_i^2} ,\\
+&2\mu D = p_i\,\frac{R_i^2 R_e^2}{R_e^2 - R_i^2} ,
+\end{aligned}
+\right.
+$$
+et finalement
+$$
+\boxed{
+\sigma_{rr} = \frac{p_i R_i^2}{R_e^2 - R_i^2}\left(1 - \frac{R_e^2}{r^2}\right),
+\qquad
+\sigma_{\theta\theta} = \frac{p_i R_i^2}{R_e^2 - R_i^2}\left(1 + \frac{R_e^2}{r^2}\right),
+\qquad
+\sigma_{zz} = \frac{p_i R_i^2}{R_e^2 - R_i^2} .
+}
+$$
+:::
+
+
+
+```{python}
+#| label: fig-reservoir-contraintes
+#| fig-cap: "Réservoir sous pression : contraintes dans l'épaisseur du tube, rapportées à la pression $p_i$. Le curseur fait varier l'épaisseur $e = R_e - R_i$ (rapportée à $R_i$ ; version PDF : $e = R_i/2$). La contrainte orthoradiale $\\sigma_{\\theta\\theta}$ (traction) est la plus grande et maximale en paroi intérieure, où $\\sigma_{rr} = -p_i$ ; $\\sigma_{rr}$ s'annule en paroi extérieure et $\\sigma_{zz}$ est uniforme."
+epaisseurs = np.round(np.arange(0.1, 2.01, 0.1), 1)       # e / R_i
+k0 = int(np.argmin(abs(epaisseurs - 0.5)))
+NUIT = COULEURS[2]
+courbes = [("σ<sub>θθ</sub>/p<sub>i</sub>", COULEURS[0]),
+           ("σ<sub>zz</sub>/p<sub>i</sub>", NUIT),
+           ("σ<sub>rr</sub>/p<sub>i</sub>", CORAIL_FONCE)]
+x_max = 1 + epaisseurs.max()
+
+def contraintes(e):
+    re = 1 + e                                   # R_i = 1, p_i = 1
+    r = np.linspace(1.0, re, 120)
+    a = 1.0 / (re**2 - 1.0)
+    return re, r, [a * (1 + re**2 / r**2), a * np.ones_like(r), a * (1 - re**2 / r**2)]
+
+def habillage(e):
+    """Axes fléchés, graduations R_i / R_e et étiquettes en bout de courbe (comme au tableau)."""
+    re, r, val = contraintes(e)
+    y_haut = 1.15 * val[0][0]
+    y_bas = -1.6
+    ann = [dict(x=x_max + 0.12, y=0, ax=0.93, ay=0, xref="x", yref="y", axref="x", ayref="y",
+                showarrow=True, arrowhead=2, arrowsize=1.2, arrowwidth=1.6, arrowcolor=NUIT, text=""),
+           dict(x=1, y=y_haut, ax=1, ay=y_bas, xref="x", yref="y", axref="x", ayref="y",
+                showarrow=True, arrowhead=2, arrowsize=1.2, arrowwidth=1.6, arrowcolor=NUIT, text=""),
+           dict(x=x_max + 0.15, y=0, text="<i>r</i>", showarrow=False, xanchor="left",
+                font=dict(size=20, color=NUIT)),
+           dict(x=1, y=y_haut, text="σ/p<sub>i</sub>", showarrow=False, yanchor="bottom",
+                font=dict(size=18, color=NUIT)),
+           dict(x=1, y=0, text="R<sub>i</sub>", showarrow=False, yanchor="top", xanchor="right",
+                yshift=-4, font=dict(size=18, color=NUIT)),
+           dict(x=re, y=0, text="R<sub>e</sub>", showarrow=False, yanchor="bottom", yshift=6,
+                font=dict(size=18, color=NUIT)),
+           dict(x=re, y=0.025 * (y_haut - y_bas), ax=re, ay=-0.025 * (y_haut - y_bas), xref="x", yref="y", axref="x", ayref="y",
+                showarrow=True, arrowhead=0, arrowwidth=1.2, arrowcolor=NUIT, text="")]
+    # σ_rr s'annule en R_e : son étiquette est placée plus bas, au niveau de σ_rr(R_i) / 2
+    hauteurs = [val[0][-1], val[1][-1], 0.5 * val[2][0]]
+    for (nom, coul), y in zip(courbes, hauteurs):
+        ann.append(dict(x=re, y=y, text=nom, showarrow=False, xanchor="left", xshift=10,
+                        font=dict(size=18, color=coul)))
+    return dict(annotations=ann, yaxis=dict(range=[y_bas, y_haut * 1.12], visible=False))
+
+fig = go.Figure()
+for k, e in enumerate(epaisseurs):
+    re, r, val = contraintes(e)
+    for (nom, coul), v in zip(courbes, val):
+        fig.add_trace(go.Scatter(x=r, y=v, mode="lines", line=dict(color=coul, width=3),
+                                 name=nom, showlegend=False, visible=(k == k0),
+                                 hovertemplate="r/R<sub>i</sub> = %{x:.2f}<br>" + nom + " = %{y:.2f}<extra></extra>"))
+
+steps = []
+for k, e in enumerate(epaisseurs):
+    vis = [j // len(courbes) == k for j in range(len(epaisseurs) * len(courbes))]
+    h = habillage(e)
+    steps.append(dict(method="update", label=f"{e:.1f}",
+                      args=[{"visible": vis}, {"annotations": h["annotations"], "yaxis.range": h["yaxis"]["range"]}]))
+
+fig.update_layout(
+    sliders=[dict(active=k0, currentvalue=dict(prefix="e / R_i = "), steps=steps, pad=dict(t=30))],
+    xaxis=dict(range=[0.9, x_max + 0.6], visible=False),
+    height=520, margin=dict(l=20, r=20, t=30, b=100), plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(family="Latin Modern Roman, CMU Serif, Times New Roman, serif"),
+    **habillage(epaisseurs[k0]),
+)
+fig.show()
+```

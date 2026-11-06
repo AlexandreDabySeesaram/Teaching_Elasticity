@@ -1,0 +1,19 @@
+\documentclass[border=0pt]{standalone}
+\usepackage{tikz,amsmath}
+\definecolor{nuit}{HTML}{190F3C}\definecolor{bleu}{HTML}{3746FF}\definecolor{corailf}{HTML}{D6455A}
+\newcommand{\vv}[1]{\underline{#1}}
+\newcommand{\pos}[2]{(#1*0.75pt,{(300-#2)*0.75pt})}
+\begin{document}
+\begin{tikzpicture}[x=1pt,y=1pt]
+\node[inner sep=0,anchor=south west] at (0,0) {\includegraphics[width=300pt]{fond_pression.pdf}};
+\Large
+\node[nuit] at \pos{200}{180} {$\Omega,\ p$};
+\node[corailf,anchor=south] at \pos{120}{88} {$\partial\Omega_1$};
+\node[nuit,anchor=west] at \pos{318}{255} {$\partial\Omega_2$};
+\node[nuit,anchor=east] at \pos{245}{112} {$\vv{n} = -\vv{e}_z$};
+\node[nuit,anchor=north] at \pos{318}{150} {$\vv{n}$};
+\node[nuit,anchor=south] at \pos{88}{130} {$\vv{n}$};
+\node[nuit,anchor=east] at \pos{26}{192} {$\vv{e}_z$};
+\node[bleu,anchor=south] at \pos{255}{76} {$R$};
+\end{tikzpicture}
+\end{document}

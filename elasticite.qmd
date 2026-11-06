@@ -1,0 +1,89 @@
+---
+title: "Élasticité linéaire"
+jupyter: python3
+format:
+  html:
+    resources:
+      - "Elasticité_2026_10_22.pdf"
+      - "Elasticité_2026_11_06.pdf"
+  pdf:
+    output-file: elasticite.pdf
+---
+
+\newcommand{\vv}[1]{\underline{#1}}
+\newcommand{\tsd}[1]{\underline{\underline{#1}}}
+\newcommand{\tsq}[1]{\underline{\underline{\underline{\underline{#1}}}}}
+\newcommand{\Id}{\tsd{\mathbf{1}}}
+\newcommand{\eps}{\tsd{\varepsilon}}
+\newcommand{\sig}{\tsd{\sigma}}
+\newcommand{\Cel}{\tsq{C}}
+\newcommand{\Sel}{\tsq{S}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\dive}{\operatorname{div}}
+\newcommand{\grad}{\operatorname{grad}}
+\newcommand{\T}{{}^{t}}
+\newcommand{\wel}{w_{\text{élas}}}
+\newcommand{\sigD}{\tsd{\sigma}^{D}}
+\newcommand{\svm}{\sigma_{\text{VM}}}
+
+```{python}
+#| label: setup
+#| echo: false
+
+
+import base64
+
+import numpy as np
+import plotly.graph_objects as go
+import plotly.io as pio
+from IPython.display import display
+
+try:
+    pio.kaleido.scope.mathjax = None
+except Exception:
+    pass
+
+if not hasattr(go.Figure, "_show_origine"):
+    go.Figure._show_origine = go.Figure.show
+
+def _show_multi(self, *args, **kwargs):
+    html = self.to_html(full_html=False, include_plotlyjs=False,
+                        config={"responsive": True, "displaylogo": False})
+    sorties = {"text/html": html}
+    try:
+        pdf = self.to_image(format="pdf", width=900,
+                            height=self.layout.height or 450)
+        sorties["application/pdf"] = base64.b64encode(pdf).decode()
+    except Exception:
+        # Sans kaleido une note remplace la figure dans le PDF
+        sorties["text/markdown"] = "*Figure interactive disponible dans la version HTML.*"
+    display(sorties, raw=True)
+
+go.Figure.show = _show_multi
+
+
+from plotly.offline import get_plotlyjs
+display({"text/html": "<script>window.__define_sauve = window.define; window.define = undefined;</script>"
+                      "<script type=\"text/javascript\">" + get_plotlyjs() + "</script>"
+                      "<script>window.define = window.__define_sauve;</script>",
+         # sortie vide pour le PDF (sinon « Unable to display output… »)
+         "text/markdown": ""},
+        raw=True)
+
+pio.templates.default = "plotly_white"
+# Charte graphique ENSTA : bleu ENSTA, corail, bleu nuit, bleu ENSTA clair
+COULEURS = ["#3746ff", "#ff808b", "#190f3c", "#9ba2ff"]
+CORAIL_FONCE = "#d6455a"
+```
+
+::: {.content-visible when-format="pdf"}
+*Version en ligne du cours et autres ressources : <https://alexandredabyseesaram.github.io/>.*
+:::
+
+# Séance 1 — Loi de comportement, élasticité linéaire isotrope et thermoélasticité {#sec-seance1}
+
+{{< include seances/_seance1.qmd >}}
+
+# Séance 2 — Critères de limite élastique et techniques de résolution analytique {#sec-seance2}
+
+{{< include seances/_seance2.qmd >}}

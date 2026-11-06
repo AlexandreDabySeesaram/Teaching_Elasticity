@@ -1,0 +1,16 @@
+\documentclass[border=0pt]{standalone}
+\usepackage{tikz,amsmath}
+\definecolor{nuit}{HTML}{190F3C}\definecolor{bleu}{HTML}{3746FF}\definecolor{corailf}{HTML}{D6455A}
+\newcommand{\vv}[1]{\underline{#1}}
+\newcommand{\pos}[2]{(#1*0.75pt,{(300-#2)*0.75pt})}
+\begin{document}
+\begin{tikzpicture}[x=1pt,y=1pt]
+\node[inner sep=0,anchor=south west] at (0,0) {\includegraphics[width=300pt]{fond.pdf}};
+\Large
+\node[nuit,anchor=east]  at \pos{160}{100} {$\vv{n}$};
+\node[bleu,anchor=west]  at \pos{216}{113} {$\vv{T}$};
+\node[nuit,anchor=north east] at \pos{120}{186} {$dS$};
+\node[corailf,anchor=west] at \pos{246}{54} {$\Omega^-$};
+\node[nuit,anchor=west] at \pos{300}{228} {$\Omega^+$};
+\end{tikzpicture}
+\end{document}

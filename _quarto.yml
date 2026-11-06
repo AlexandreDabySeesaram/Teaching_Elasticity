@@ -80,6 +80,10 @@ format:
         \addtokomafont{disposition}{\color{enstanuit}}
         \addtokomafont{title}{\color{enstanuit}}
         \addtokomafont{subtitle}{\color{enstableu}}
+        % Titres en police serif (KOMA les met en sans-serif par défaut)
+        \addtokomafont{disposition}{\rmfamily}
+        \addtokomafont{title}{\rmfamily}
+        \addtokomafont{subtitle}{\rmfamily}
         % Encadrés (callouts) aux couleurs ENSTA, une couleur par type
         \definecolor{enstableuclair}{HTML}{9BA3FF}
         \definecolor{enstacorailfonce}{HTML}{D6455A}
