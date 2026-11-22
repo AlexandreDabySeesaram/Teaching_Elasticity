@@ -1,0 +1,799 @@
+*Notes manuscrites de la séance : [elasticite_2026_11_20.pdf](notes/elasticite_2026_11_20.pdf) (pages 56 et suivantes).*
+
+
+## Résolution par la minimisation de l'énergie potentielle {#sec-energie}
+
+::: {.callout-note}
+### Objectif
+
+En général, lorsque le problème que l'on souhaite résoudre porte sur une géométrie et/ou un chargement complexe, il n'est plus possible de déterminer de solution exacte à notre problème. Il est alors possible de déterminer des **solutions approchées** : c'est le sujet de ce chapitre.
+:::
+
+On rappelle le problème d'élastostatique étudié dans le cadre de ce cours (voir @sec-bilan-equations) :
+
+- **Équilibre** : $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, avec $\sig = \T\sig$,
+- **Compatibilité** : $\eps = \frac{1}{2}\left(\tsd{\nabla}\vv{u} + \T\tsd{\nabla}\vv{u}\right)$,
+- **Conditions aux limites** : $\vv{u} = \vv{u}_d$ sur $\partial\Omega_u$ et $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$.
+
+L'objectif de ce chapitre est de montrer que ce problème est **équivalent à la minimisation d'une énergie**. Il ne s'agit pas là d'introduire une nouvelle physique, mais une **reformulation** du problème, sous forme faible puis sous forme de minimisation.
+
+La résolution de ce problème de minimisation mène à la **solution exacte** si celle-ci appartient à l'espace sur lequel on effectue la minimisation. En se plaçant dans un sous-espace ne contenant pas la solution, on peut alors tout de même trouver une **approximation**, en cherchant l'élément de ce sous-espace minimisant l'énergie du problème, lorsqu'une telle énergie existe.
+
+::: {.callout-warning}
+### Attention : forces non conservatives
+
+Dans le cadre de forces non conservatives par exemple, où la force ne dérive pas d'un potentiel, l'énergie mécanique n'est plus conservée et la solution ne minimise plus l'énergie potentielle du système. C'est le cas du **frottement**, mais aussi des **forces suiveuses** (par exemple une pression qui reste normale à une surface qui tourne).
+
+Sans potentiel, le principe des travaux virtuels (@sec-ptv) reste valable (c'est lui qu'utilisent les éléments finis), mais il n'est plus la stationnarité d'aucune quantité : la matrice de rigidité n'est alors plus symétrique.
+:::
+
+### Principe des travaux virtuels (PTV) {#sec-ptv}
+
+#### Espaces d'admissibilité {#sec-espaces-admissibilite}
+
+On précise ici les définitions de la @sec-admissibilite.
+
+::: {.callout-important}
+### Définition : champs admissibles
+
+- **Statiquement admissible (SA).** Un champ de contrainte $\sig^{\star}$ est dit SA si et seulement si
+$$
+\left\{
+\begin{aligned}
+&\dive\sig^{\star} + \vv{f}_v = \vv{0} \quad \text{dans } \Omega, \qquad \sig^{\star} = \T\sig^{\star},\\
+&\sig^{\star}\,\vv{n} = \vv{f}_s \quad \text{sur } \partial\Omega_f .
+\end{aligned}
+\right.
+$$
+- **Cinématiquement admissible (CA).** Un champ de déplacement $\vv{u}^{\star}$ est dit CA si et seulement si
+$$
+\vv{u}^{\star} = \vv{u}_d \quad \text{sur } \partial\Omega_u .
+$$
+- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{\circ}$ est dit CA0 si et seulement si
+$$
+\vv{u}^{\circ} = \vv{0} \quad \text{sur } \partial\Omega_u .
+$$
+:::
+
+::: {.callout-note}
+### Remarque : CA0 = variations admissibles
+
+Si l'on part d'un champ $\vv{u} \in \mathrm{CA}$ que l'on perturbe pour obtenir un autre champ $\vv{u}^{\star} \in \mathrm{CA}$, la **variation** $\vv{u}^{\circ} = \vv{u}^{\star} - \vv{u}$ vérifie $\vv{u}^{\circ} = \vv{u}_d - \vv{u}_d = \vv{0}$ sur $\partial\Omega_u$, donc $\vv{u}^{\circ} \in \mathrm{CA}_0$.
+
+Un champ $\vv{u}^{\circ} \in \mathrm{CA}_0$ représente donc une **variation admissible** du déplacement autour d'un champ $\vv{u} \in \mathrm{CA}$ :
+$$
+\forall h \in \mathbb{R}, \qquad \vv{u} + h\,\vv{u}^{\circ} \in \mathrm{CA} .
+$$
+:::
+
+#### Énoncé du PTV {#sec-enonce-ptv}
+
+::: {.callout-important}
+### Principe des travaux virtuels
+
+Un champ de contrainte $\sig^{\star}$ (symétrique) est SA si et seulement si le travail de $\sig^{\star}$ dans la déformation $\eps(\vv{u}^{\circ})$ associée à **toute** variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ est égal au travail des efforts extérieurs donnés dans ce même champ $\vv{u}^{\circ}$ :
+$$
+\sig^{\star} \in \mathrm{SA}
+\quad\Longleftrightarrow\quad
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{\circ}),
+\qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
+$$ {#eq-ptv}
+où
+$$
+W_{\text{ext}}(\vv{u}^{\circ}) := \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V + \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{\circ}\,\mathrm{d}S .
+$$
+:::
+
+::: {.callout-note}
+### Remarques
+
+- Cette équation s'appelle le **principe des travaux virtuels**.
+- Puisqu'on s'intéresse au travail de variations $\vv{u}^{\circ} \in \mathrm{CA}_0$ (donc nulles sur $\partial\Omega_u$), le travail des efforts de réaction (inconnus) est nul : ces efforts n'apparaissent pas dans $W_{\text{ext}}$, seuls les efforts **connus** y apparaissent.
+- Les équations locales d'équilibre sont remplacées par une **formulation intégrale** (formulation variationnelle, ou **forme faible**). Plutôt que de vérifier l'équilibre en tout point, on impose la nullité du travail pour toute variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ de déplacement. Ceci se traduit par la stationnarité de l'énergie potentielle quand elle existe, mais le PTV reste valable qu'une telle énergie existe ou non.
+- Quand une énergie potentielle $W$ existe, l'équilibre s'écrit comme la **stationnarité** de $W$ dans toutes les directions admissibles $\vv{u}^{\circ}$ :
+$$
+DW(\vv{u})(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
+$$
+où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{\circ}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle).
+:::
+
+::: {.callout-tip}
+### Analogie avec le ressort
+
+On considère un ressort de raideur $k$, fixé à un mur et soumis à une force $F$ à son extrémité, de déplacement $u$. Son énergie potentielle est
+$$
+E_p = \underbrace{\frac{1}{2}\,k\,u^2}_{\text{énergie élastique}} - \underbrace{F\,u}_{W_F} .
+$$
+$u$ est une position d'équilibre $\Longleftrightarrow$ $u$ stationnarise $E_p$ $\Longleftrightarrow$ $\dfrac{\mathrm{d}E_p}{\mathrm{d}u} = 0$ $\Longleftrightarrow$ $k\,u - F = 0$.
+
+Autrement dit, la variation d'énergie pour une petite variation $\delta u$ est nulle à l'ordre 1 :
+$$
+E_p(u + \delta u) - E_p(u) = \underbrace{E_p'(u)\,\delta u}_{\delta E_p} + o(\delta u) .
+$$
+On veut $\delta E_p = 0$, c'est-à-dire
+$$
+E_p'(u)\,\delta u = 0 \quad \forall\,\delta u
+\qquad\Longrightarrow\qquad
+(k\,u - F)\,\delta u = 0 \quad \forall\,\delta u .
+$$
+La quantité $\delta u$ est ce que l'on va appeler un **déplacement virtuel** : elle « teste » cette direction. On peut poser $\delta u = h\,u^{\circ}$ et, puisque l'équation est linéaire, on retrouve
+$$
+(k\,u - F)\,u^{\circ} = 0 \qquad \forall\,u^{\circ} .
+$$
+
+En 1D, garder $\delta u$ et pas juste $E_p' = 0$ est artificiel, mais en mécanique des milieux continus on ne peut pas dériver $E_p$ par rapport à l'infinité de valeurs $\vv{u}(\vv{x})$ en tout point : d'où la notion de **dérivée de Gâteaux** (@sec-gateaux).
+:::
+
+#### Démonstration du PTV {#sec-preuve-ptv}
+
+::: {.callout-note collapse="false"}
+### Démonstration : $\sig^{\star} \in \mathrm{SA} \Longrightarrow$ PTV
+
+Soit $\sig^{\star} \in \mathrm{SA}$ et $\vv{u}^{\circ} \in \mathrm{CA}_0$. L'équilibre donne
+$$
+\dive\sig^{\star} + \vv{f}_v = \vv{0}
+\;\Longrightarrow\;
+\dive\sig^{\star}\cdot\vv{u}^{\circ} + \vv{f}_v\cdot\vv{u}^{\circ} = 0
+\;\Longrightarrow\;
+\int_\Omega \left(\dive\sig^{\star}\cdot\vv{u}^{\circ} + \vv{f}_v\cdot\vv{u}^{\circ}\right)\mathrm{d}V = 0 .
+$$
+On rappelle que (en notation d'Einstein, avec $\sig$ symétrique)
+$$
+\dive\left(\sig\,\vv{u}^{\circ}\right) = \left(\sigma_{ij}\,u^{\circ}_j\right)_{,i}
+= \sigma_{ij,i}\,u^{\circ}_j + \sigma_{ij}\,u^{\circ}_{j,i}
+= \underbrace{\sigma_{ji,i}\,u^{\circ}_j}_{\dive\sig\cdot\vv{u}^{\circ}} + \underbrace{\sigma_{ij}\,u^{\circ}_{j,i}}_{\sig : \tsd{\nabla}\vv{u}^{\circ}} ,
+$$
+d'où
+$$
+\int_\Omega \dive\left(\sig^{\star}\vv{u}^{\circ}\right)\mathrm{d}V - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0 .
+$$
+Par le théorème de Green (flux-divergence),
+$$
+\int_{\partial\Omega} \left(\sig^{\star}\vv{n}\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0 .
+$$
+Par symétrie de $\sig^{\star}$, $\sig^{\star} : \tsd{\nabla}\vv{u}^{\circ} = \sig^{\star} : \eps(\vv{u}^{\circ})$. En effet,
+$$
+\sig : \tsd{\nabla}\vv{u} = \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j} + \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j}
+= \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j} + \tfrac{1}{2}\,\underbrace{\sigma_{ji}\,u_{i,j}}_{=\,\sigma_{ij}\,u_{j,i}}
+= \sig : \eps(\vv{u}) .
+$$
+Soit, en séparant $\partial\Omega = \partial\Omega_u \cup \partial\Omega_f$ :
+$$
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V
+= \underbrace{\int_{\partial\Omega_u} \left(\sig^{\star}\vv{n}\right)\cdot\underbrace{\vv{u}^{\circ}}_{=\,\vv{0}}\,\mathrm{d}S}_{=\,0}
++ \underbrace{\int_{\partial\Omega_f} \underbrace{\left(\sig^{\star}\vv{n}\right)}_{=\,\vv{f}_s}\cdot\vv{u}^{\circ}\,\mathrm{d}S
++ \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V}_{W_{\text{ext}}(\vv{u}^{\circ})} .
+$$
+:::
+
+::: {.callout-note collapse="false"}
+### Démonstration : PTV $\Longrightarrow \sig^{\star} \in \mathrm{SA}$
+
+On suppose
+$$
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V - \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V - \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{\circ}\,\mathrm{d}S = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+$$
+De même, $\sig^{\star}$ étant symétrique, $\sig^{\star} : \eps(\vv{u}^{\circ}) = \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ} = \dive\left(\sig^{\star}\vv{u}^{\circ}\right) - \dive\sig^{\star}\cdot\vv{u}^{\circ}$, d'où, avec le théorème de Green et puisque $\vv{u}^{\circ} = \vv{0}$ sur $\partial\Omega_u$ (le terme de bord se réduit à $\int_{\partial\Omega_f}(\sig^{\star}\vv{n})\cdot\vv{u}^{\circ}\,\mathrm{d}S$) :
+$$
+\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S
+- \int_\Omega \left(\dive\sig^{\star} + \vv{f}_v\right)\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0,
+\qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+$$
+Donc, **en choisissant judicieusement** les $\vv{u}^{\circ}$, on peut montrer la relocalisation des équations en utilisant le **lemme fondamental du calcul des variations** : il faut choisir pour $\Omega$ (resp. $\partial\Omega_f$) une « bosse » nulle sur $\partial\Omega$ (resp. sur le reste du bord), centrée sur un point de $\Omega$ (resp. $\partial\Omega_f$), pour relocaliser.
+
+1. Des $\vv{u}^{\circ}$ nuls sur tout $\partial\Omega$, concentrés autour d'un point de $\Omega$ : le terme de bord disparaît, et il reste $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ dans $\Omega$.
+2. On réinjecte ce résultat : il ne reste que $\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S = 0$, et des $\vv{u}^{\circ}$ concentrés près d'un point de $\partial\Omega_f$ donnent $\sig^{\star}\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$.
+
+Par exemple, avec $\varphi \geq 0$ une bosse nulle sur $\partial\Omega$, le choix $\vv{u}^{\circ} = \varphi\left(\dive\sig^{\star} + \vv{f}_v\right)$ donne $\int_\Omega \varphi\,\left|\dive\sig^{\star} + \vv{f}_v\right|^2\mathrm{d}V = 0$, donc $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ là où $\varphi > 0$.
+:::
+
+### Théorème d'unicité {#sec-unicite}
+
+::: {.callout-important}
+### Théorème d'unicité
+
+En élasticité linéaire (et, plus généralement, en HPP avec une énergie convexe) :
+
+- le champ de **déplacement**, quand il existe, est unique à un déplacement de corps rigide CA0 près,
+- le champ de **contrainte**, quand il existe, est unique.
+:::
+
+::: {.callout-note collapse="false"}
+### Démonstration
+
+Soient deux solutions distinctes $(\vv{u}^1, \sig^1)$ et $(\vv{u}^2, \sig^2) \in \mathrm{CA}\times\mathrm{SA}$. Le PTV donne, pour $i \in \{1, 2\}$,
+$$
+\int_\Omega \eps(\vv{u}^i) : \Cel : \eps(\vv{u}^{\circ})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{\circ}), \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+$$
+Par linéarité, en faisant la différence (1) − (2) :
+$$
+\int_\Omega \eps(\vv{u}^1 - \vv{u}^2) : \Cel : \eps(\vv{u}^{\circ})\,\mathrm{d}V = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+$$
+On peut notamment prendre $\vv{u}^{\circ} = \vv{u}^1 - \vv{u}^2$ (qui est bien CA0) :
+$$
+\int_\Omega \underbrace{\eps(\vv{u}^1 - \vv{u}^2) : \Cel : \eps(\vv{u}^1 - \vv{u}^2)}_{\geq\,0}\,\mathrm{d}V = 0 .
+$$
+$\Cel$ est défini positif, donc l'intégrande est positif ou nul, et cette quantité doit donc être nulle partout pour annuler l'intégrale. $\Cel$ étant défini, on en déduit
+$$
+\eps(\vv{u}^1 - \vv{u}^2) = \tsd{0},
+$$
+soit : $\vv{u}^1$ et $\vv{u}^2$ diffèrent d'un mouvement de corps rigide près. Par ailleurs,
+$$
+\sig^1 - \sig^2 = \Cel : \eps^1 - \Cel : \eps^2 = \Cel : \left(\eps^1 - \eps^2\right) = \Cel : \eps(\vv{u}^1 - \vv{u}^2) = \tsd{0} .
+$$
+D'où $\sig^1 = \sig^2$, et $\vv{u}^1$ et $\vv{u}^2$ ne diffèrent que d'un mouvement de corps rigide.
+:::
+
+::: {.callout-note}
+### Remarque : positivité de $\Cel$ en notation de Voigt
+
+En notation de Voigt (séance 1), $\eps : \Cel : \eps = \{\varepsilon\}^{T}\,[C]\,\{\varepsilon\}$ : dire que $\Cel$ est défini positif revient à dire que la matrice $6\times 6$ $[C]$ est symétrique définie positive. C'est ce qui permet de « sentir » que $\eps : \Cel : \eps \geq 0$, avec égalité si et seulement si $\eps = \tsd{0}$.
+:::
+
+### Énergie potentielle d'une configuration CA {#sec-energie-potentielle}
+
+::: {.callout-important}
+### Définitions
+
+Soit $\vv{u}^{\star} \in \mathrm{CA}$. On définit :
+
+- l'**énergie élastique**
+$$
+W_{\text{élas}}(\vv{u}^{\star}) = \frac{1}{2}\int_\Omega \eps(\vv{u}^{\star}) : \Cel : \eps(\vv{u}^{\star})\,\mathrm{d}V,
+$$
+- le **travail des efforts extérieurs**
+$$
+W_{\text{ext}}(\vv{u}^{\star}) = \int_\Omega \vv{f}_v\cdot\vv{u}^{\star}\,\mathrm{d}V + \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{\star}\,\mathrm{d}S,
+$$
+- l'**énergie potentielle totale**
+$$
+W(\vv{u}^{\star}) = W_{\text{élas}}(\vv{u}^{\star}) - W_{\text{ext}}(\vv{u}^{\star}) .
+$$
+:::
+
+::: {.callout-important}
+### Théorème de l'énergie potentielle
+
+Le champ de déplacement $\vv{u}$ est solution du problème d'équilibre élastostatique si et seulement s'il possède la plus petite énergie potentielle parmi tous les champs de déplacement $\vv{u}^{\star}$ cinématiquement admissibles :
+$$
+W(\vv{u}) \leq W(\vv{u}^{\star}), \qquad \forall\,\vv{u}^{\star} \in \mathrm{CA} .
+$$ {#eq-thm-energie-potentielle}
+:::
+
+```{=latex}
+% Garder l'encadré (et sa figure habillée) sur une seule page
+\par\begingroup\dimen0=\pagegoal\advance\dimen0 by -\pagetotal
+\ifdim\dimen0<11cm\newpage\fi\endgroup
+```
+
+::: {.callout-note}
+### Remarque : construction de solutions approchées
+
+![Sous-espace restreint $\widetilde{\mathrm{CA}} \subset \mathrm{CA}$ et meilleure approximation $\tilde{\vv{u}}$.](figures/schema_ensembles_ca){#fig-ensembles-ca .figure-flottante width=100% fig-env="wrapfigdroite"}
+
+Ce théorème permet de construire des **solutions approchées en déplacement** lorsque la solution exacte est hors d'atteinte analytiquement :
+
+1. on restreint la recherche à un **sous-espace simplifié** (de dimension finie, souvent) de champs admissibles $\widetilde{\mathrm{CA}} \subset \mathrm{CA}$,
+2. on minimise $W$ dans ce sous-espace restreint.
+
+Si la solution exacte $\vv{u} \in \widetilde{\mathrm{CA}}$, la minimisation la trouve. Sinon, on trouve la **meilleure solution approchée** $\tilde{\vv{u}} \in \widetilde{\mathrm{CA}}$ (au sens de l'énergie, @fig-ensembles-ca). La solution approchée sera d'autant plus proche de la solution exacte que $\widetilde{\mathrm{CA}}$ est riche et pertinent.
+
+```{=latex}
+\par\vspace{0.9cm}
+\wrapstuffclear
+```
+:::
+
+#### Démonstration : équilibre $\Longrightarrow$ énergie minimale {#sec-preuve-min}
+
+::: {.callout-note collapse="false"}
+### Démonstration
+
+Soit $\vv{u}$ la solution (équilibre) et $\vv{u}^{\star} \in \mathrm{CA}$. Par linéarité de $W_{\text{ext}}$,
+$$
+W(\vv{u}^{\star}) - W(\vv{u}) = \int_\Omega \frac{1}{2}\Big(\eps(\vv{u}^{\star}) : \Cel : \eps(\vv{u}^{\star}) - \eps(\vv{u}) : \Cel : \eps(\vv{u})\Big)\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\star} - \vv{u}) .
+$$
+On note $\eps = \eps(\vv{u})$ et $\eps^{\star} = \eps(\vv{u}^{\star})$ :
+$$
+W(\vv{u}^{\star}) - W(\vv{u}) = \int_\Omega \frac{1}{2}\Big[\eps^{\star} : \Cel : \eps^{\star} - \eps : \Cel : \eps\Big]\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\star} - \vv{u}) .
+$$
+On fait apparaître l'écart $\eps^{\star} - \eps$ en écrivant $\eps^{\star} = \eps + (\eps^{\star} - \eps)$ :
+$$
+W(\vv{u}^{\star}) - W(\vv{u}) = \int_\Omega \frac{1}{2}\Big[\big(\eps + (\eps^{\star} - \eps)\big) : \Cel : \big(\eps + (\eps^{\star} - \eps)\big) - \eps : \Cel : \eps\Big]\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\star} - \vv{u}) .
+$$
+On développe le premier terme :
+$$
+\begin{aligned}
+&\big(\eps + (\eps^{\star} - \eps)\big) : \Cel : \big(\eps + (\eps^{\star} - \eps)\big)\\
+&\qquad = \eps : \Cel : \eps + \eps : \Cel : (\eps^{\star} - \eps)\\
+&\qquad\quad + (\eps^{\star} - \eps) : \Cel : \eps + (\eps^{\star} - \eps) : \Cel : (\eps^{\star} - \eps)\\
+&\qquad = \eps : \Cel : \eps + 2\,\eps : \Cel : (\eps^{\star} - \eps) + (\eps^{\star} - \eps) : \Cel : (\eps^{\star} - \eps),
+\end{aligned}
+$$
+par la **grande symétrie** de $\Cel$. Les termes $\eps : \Cel : \eps$ se simplifient :
+$$
+W(\vv{u}^{\star}) - W(\vv{u}) = \int_\Omega \frac{1}{2}\,(\eps^{\star} - \eps) : \Cel : (\eps^{\star} - \eps) + \underbrace{\eps : \Cel}_{\sig} : (\eps^{\star} - \eps)\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\star} - \vv{u}) .
+$$
+Par linéarité, $\eps^{\star} - \eps = \eps(\vv{u}^{\star} - \vv{u})$, d'où
+$$
+W(\vv{u}^{\star}) - W(\vv{u}) = \underbrace{\int_\Omega \frac{1}{2}\,\eps(\vv{u}^{\star} - \vv{u}) : \Cel : \eps(\vv{u}^{\star} - \vv{u})\,\mathrm{d}V}_{\geq\,0}
++ \underbrace{\int_\Omega \sig : \eps(\vv{u}^{\star} - \vv{u})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\star} - \vv{u})}_{=\,0 \text{ par le PTV, avec } \vv{u}^{\star} - \vv{u} \,\in\, \mathrm{CA}_0} .
+$$
+Donc $W(\vv{u}^{\star}) \geq W(\vv{u})$ pour tout $\vv{u}^{\star} \in \mathrm{CA}$ : $\vv{u}$ minimise $W$.
+:::
+
+#### Dérivée de Gâteaux {#sec-gateaux}
+
+$\vv{u}(\vv{x})$ étant de dimension possiblement infinie, on introduit une **dérivée directionnelle** : la dérivée de Gâteaux. Plutôt que de dériver par rapport à $\vv{u}$, on se donne une **direction** $\vv{u}^{\circ}$ dans laquelle on étudie la variation de $W$ :
+$$
+h \longmapsto W(\vv{u} + h\,\vv{u}^{\circ}), \qquad h \in \mathbb{R} \text{ (un scalaire)} .
+$$
+
+::: {.callout-important}
+### Définition : dérivée de Gâteaux
+
+La dérivée de $W$ en $\vv{u}$ dans la direction $\vv{u}^{\circ}$ est
+$$
+DW(\vv{u})(\vv{u}^{\circ}) = \lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})}{h} .
+$$
+En un minimum, la dérivée de Gâteaux est **nulle dans toutes les directions** (admissibles).
+:::
+
+::: {.callout-tip}
+### Analogie avec le ressort
+
+Pour le ressort, $W(u) = \frac{1}{2}\,k\,u^2 - F\,u$ et
+$$
+W(u + h\,u^{\circ}) = W(u) + h\,(k\,u - F)\,u^{\circ} + \frac{h^2}{2}\,k\,{u^{\circ}}^2 ,
+$$
+d'où $DW(u)(u^{\circ}) = (k\,u - F)\,u^{\circ}$. Le terme en $h$ (la pente) donne la stationnarité, c'est-à-dire le PTV, et le terme en $h^2$ (la courbure, positive car $k > 0$) donne le minimum.
+:::
+
+#### Démonstration : énergie minimale $\Longrightarrow$ équilibre {#sec-preuve-equilibre}
+
+::: {.callout-note collapse="false"}
+### Démonstration
+
+On considère une variation $\vv{u} + h\,\vv{u}^{\circ}$ autour du minimum $\vv{u}$, avec $\vv{u} \in \mathrm{CA}$ et $\vv{u}^{\circ} \in \mathrm{CA}_0$, d'où $\vv{u} + h\,\vv{u}^{\circ} \in \mathrm{CA}$.
+
+$\vv{u}$ est un minimum, donc la dérivée de Gâteaux est nulle dans toutes les directions :
+$$
+\lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})}{h} = 0 .
+$$
+En développant l'énergie élastique (grande symétrie de $\Cel$) et par linéarité de $W_{\text{ext}}$,
+$$
+W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})
+= h\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ})\right] + h^2\,W_{\text{élas}}(\vv{u}^{\circ}) ,
+$$
+d'où
+$$
+\lim_{h\to 0}\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ}) + h\,W_{\text{élas}}(\vv{u}^{\circ})\right] = 0
+$$
+et finalement
+$$
+\int_\Omega \underbrace{\Cel : \eps(\vv{u})}_{\sig} : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+$$
+C'est le PTV : $\sig = \Cel : \eps(\vv{u})$ est SA, d'où l'équilibre.
+:::
+
+## Application — Bloc encastré en flexion simple {#sec-bloc-flexion}
+
+::: {.callout-caution icon=false}
+### Énoncé
+
+![Bloc encastré en $x_1 = 0$ et chargé en $x_1 = L$ : vue de côté (à gauche) et section (à droite), les bords latéraux $x_3 = \pm b/2$ glissant sans frottement sur deux parois.](figures/schema_bloc_flexion){#fig-bloc-flexion width=90%}
+
+On étudie un bloc d'épaisseur $h$ et de profondeur $b$, encastré en $x_1 = 0$ et chargé sur son extrémité libre en $x_1 = L$ (@fig-bloc-flexion). Le matériau est élastique linéaire isotrope ($\lambda$, $\mu$) et on néglige les efforts volumiques.
+
+- **Bord gauche** ($x_1 = 0$) : encastrement.
+- **Bords haut et bas** ($x_2 = \pm h/2$) : bords libres.
+- **Bords latéraux** ($x_3 = \pm b/2$) : contact sans frottement.
+- **Bord droit** ($x_1 = L$) : effort surfacique purement tangentiel $\vv{f}_{si}(x_2) = \tau(x_2)\,\vv{e}_2$, de résultante connue
+$$
+\int_{-h/2}^{h/2} \tau(x_2)\,b\,\mathrm{d}x_2 = -F, \qquad F > 0 .
+$$
+
+**Approximation de la solution du problème**
+
+1. Écrire le problème aux limites.
+2. Proposer une famille de champs CA.
+3. Calculer l'énergie potentielle associée.
+4. Minimiser l'énergie potentielle et en déduire une approximation de la solution.
+:::
+
+::: {.callout-caution collapse="true" icon=false}
+### Correction
+
+**1. Problème aux limites.**
+$$
+\left\{
+\begin{aligned}
+&\dive\sig = \vv{0}, \qquad \sig = 2\mu\,\eps + \lambda\,\tr(\eps)\,\Id \quad \text{dans } \Omega,\\
+&\vv{u}(0, x_2, x_3) = \vv{0},\\
+&\sig(x_1, \pm h/2, x_3)\,(\pm\vv{e}_2) = \vv{0},\\
+&u_3(x_1, x_2, \pm b/2) = 0, \qquad \left(\sig(x_1, x_2, \pm b/2)\,\vv{e}_3\right)\cdot\vv{e}_1 = \left(\sig(x_1, x_2, \pm b/2)\,\vv{e}_3\right)\cdot\vv{e}_2 = 0,\\
+&\sig(L, x_2, x_3)\,\vv{e}_1 = \tau(x_2)\,\vv{e}_2 .
+\end{aligned}
+\right.
+$$
+La solution analytique est difficile à obtenir. On cherche donc une solution approchée.
+
+**2. Famille de champs CA.** On choisit un sous-espace de dimension 2,
+$$
+\vv{u}^{\star}(x_1, x_2, x_3) = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2, \qquad (\alpha, \beta) \in \mathbb{R}^2 .
+$$
+En $x_1 = 0$, $\vv{u}^{\star} = \vv{0}$, et $u^{\star}_3 = 0$ partout. On vérifie donc que $\vv{u}^{\star} \in \mathrm{CA}$ pour tout $(\alpha, \beta) \in \mathbb{R}^2$.
+
+**3. Énergie potentielle.** La déformation associée est
+$$
+\eps(\vv{u}^{\star}) =
+\begin{pmatrix}
+\alpha\,x_2 & \frac{1}{2}(\alpha + 2\beta)\,x_1 & 0\\
+\frac{1}{2}(\alpha + 2\beta)\,x_1 & 0 & 0\\
+0 & 0 & 0
+\end{pmatrix},
+\qquad \tr\eps = \alpha\,x_2 .
+$$
+L'énergie élastique vaut
+$$
+\begin{aligned}
+W_{\text{élas}} &= \int_\Omega \frac{1}{2}\,\eps(\vv{u}^{\star}) : \Cel : \eps(\vv{u}^{\star})\,\mathrm{d}V
+= \int_\Omega \frac{1}{2}\left[\lambda\,(\tr\eps)^2 + 2\mu\,\eps : \eps\right]\mathrm{d}V\\
+&= \frac{1}{2}\int_0^L\!\!\int_{-h/2}^{h/2} \left[(\lambda + 2\mu)\,(\alpha\,x_2)^2 + \mu\,(\alpha + 2\beta)^2 x_1^2\right] b\,\mathrm{d}x_1\,\mathrm{d}x_2 ,
+\end{aligned}
+$$
+soit
+$$
+W_{\text{élas}} = \frac{1}{2}\left[\underbrace{(\lambda + 2\mu)\,\frac{b h^3 L}{12}}_{C_1}\,\alpha^2 + \underbrace{\frac{\mu\,b h L^3}{3}}_{C_2}\,(\alpha + 2\beta)^2\right]
+= \frac{1}{2}
+\begin{pmatrix}\alpha & \beta\end{pmatrix}
+\begin{pmatrix} K_{11} & K_{12}\\ K_{12} & K_{22}\end{pmatrix}
+\begin{pmatrix}\alpha\\ \beta\end{pmatrix},
+$$
+avec $K_{11} = C_1 + C_2$, $K_{12} = 2C_2$ et $K_{22} = 4C_2$.
+
+Seul le bord droit est chargé. Le travail des efforts extérieurs vaut
+$$
+\begin{aligned}
+W_{\text{ext}} &= \int_{\partial\Omega_f} \vv{f}_{si}\cdot\vv{u}^{\star}\,\mathrm{d}S
+= \int_{-h/2}^{h/2} \tau(x_2)\,\vv{e}_2\cdot\left(\alpha\,L\,x_2\,\vv{e}_1 + \beta\,L^2\,\vv{e}_2\right) b\,\mathrm{d}x_2\\
+&= \beta\,L^2 \int_{-h/2}^{h/2} \tau(x_2)\,b\,\mathrm{d}x_2
+= -\beta\,L^2\,F .
+\end{aligned}
+$$
+Le terme en $\alpha$ disparaît car $\vv{e}_2\cdot\vv{e}_1 = 0$. Seule la résultante $F$ intervient, quelle que soit la répartition $\tau(x_2)$. L'énergie potentielle est alors
+$$
+W(\alpha, \beta) = \frac{1}{2}\left(K_{11}\,\alpha^2 + 2K_{12}\,\alpha\beta + K_{22}\,\beta^2\right) + \beta\,L^2\,F .
+$$
+
+**4. Minimisation.** $W$ est minimale lorsque
+$$
+\frac{\partial W}{\partial \alpha} = K_{11}\,\alpha + K_{12}\,\beta = 0,
+\qquad
+\frac{\partial W}{\partial \beta} = K_{12}\,\alpha + K_{22}\,\beta = -F L^2 .
+$$
+Par les formules de Cramer, avec $K_{11}K_{22} - K_{12}^2 = 4\,C_1 C_2$ :
+$$
+\alpha = \frac{\begin{vmatrix} 0 & K_{12}\\ -FL^2 & K_{22}\end{vmatrix}}{\begin{vmatrix} K_{11} & K_{12}\\ K_{12} & K_{22}\end{vmatrix}}
+= \frac{F L^2\,K_{12}}{K_{11}K_{22} - K_{12}^2}
+= \frac{6\,F L}{(\lambda + 2\mu)\,b h^3},
+$$
+$$
+\beta = \frac{\begin{vmatrix} K_{11} & 0\\ K_{12} & -FL^2\end{vmatrix}}{\begin{vmatrix} K_{11} & K_{12}\\ K_{12} & K_{22}\end{vmatrix}}
+= -\frac{F L^2\,K_{11}}{K_{11}K_{22} - K_{12}^2}
+= -\frac{3\,F L}{(\lambda + 2\mu)\,b h^3} - \frac{3\,F}{4\,\mu\,b h L} .
+$$
+L'approximation de la solution est donc $\tilde{\vv{u}} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$ avec ces valeurs de $\alpha$ et $\beta$.
+:::
+
+### Paysage énergétique {#sec-bloc-paysage}
+
+::: {.callout-warning}
+### Attention : minimum dans $\widetilde{\mathrm{CA}}$, pas dans CA
+
+Dans cette section, $W$ n'est tracée que sur le sous-espace $\widetilde{\mathrm{CA}}$ de dimension 2 des champs $\vv{u}^{\star} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$, paramétré par $(\alpha, \beta)$. Le fond de la vallée est le minimum de $W$ **dans ce plan**, c'est-à-dire la solution approchée $\tilde{\vv{u}}$, et non le vrai minimum de $W$ sur l'espace CA de tous les déplacements admissibles, qui est la solution exacte $\vv{u}$. Comme $\widetilde{\mathrm{CA}} \subset \mathrm{CA}$, on a $W(\vv{u}) \leq W(\tilde{\vv{u}})$ : le vrai minimum est plus bas que le fond de cette vallée (@fig-ensembles-ca).
+:::
+
+L'énergie potentielle $W(\alpha, \beta)$ est une forme quadratique définie positive plus un terme linéaire : c'est un paraboloïde elliptique, dont le minimum est le couple $(\alpha, \beta)$ trouvé à la question 4. Comme $C_2 \gg C_1$ pour un bloc élancé, la vallée est très allongée : on se déplace presque sans coût énergétique le long de la direction $\alpha + 2\beta = \text{cste}$, celle où le cisaillement $\varepsilon_{12}$ ne change pas, c'est-à-dire, en variables réduites, presque le long de la diagonale $\alpha/\alpha_{\text{opt}} = \beta/\beta_{\text{opt}}$. Dans les figures ci-dessous, $\alpha$ et $\beta$ sont rapportés à leurs valeurs optimales $\alpha_{\text{opt}}$ et $\beta_{\text{opt}}$, et $W$ à $|W_{\min}|$.
+
+```{python}
+#| label: param-bloc
+#| code-summary: "Afficher le code : données et énergie W(α, β)"
+
+# Données (sans dimension) : bloc élancé L/h = 5
+L, h, b = 1.0, 0.2, 1.0
+E, nu = 1.0, 0.3
+F = 1e-3
+lam = E * nu / ((1 + nu) * (1 - 2 * nu))
+mu = E / (2 * (1 + nu))
+
+# Raideurs de la correction
+C1 = (lam + 2 * mu) * b * h**3 * L / 12
+C2 = mu * b * h * L**3 / 3
+K11, K12, K22 = C1 + C2, 2 * C2, 4 * C2
+
+# Solution approchée (minimum de W)
+alpha = 6 * F * L / ((lam + 2 * mu) * b * h**3)
+beta = -3 * F * L / ((lam + 2 * mu) * b * h**3) - 3 * F / (4 * mu * b * h * L)
+
+def W(a, bt):
+    """Énergie potentielle W(α, β) = W_élas − W_ext."""
+    return 0.5 * (K11 * a**2 + 2 * K12 * a * bt + K22 * bt**2) + bt * L**2 * F
+
+W_min = W(alpha, beta)
+
+# Grille en variables réduites a = α/α_opt, c = β/β_opt
+a = np.linspace(0, 2, 151)
+c = np.linspace(0, 2, 151)
+A, Cc = np.meshgrid(a, c)
+Z = W(A * alpha, Cc * beta) / abs(W_min)
+Z_tronque = np.where(Z <= 3, Z, np.nan)   # on n'affiche que le fond de la vallée
+```
+
+::: {.content-visible when-format="html"}
+```{python}
+#| label: fig-bloc-energie-3d
+#| fig-cap: "Énergie potentielle $W(\\alpha, \\beta)/|W_{\\min}|$ restreinte au plan $(\\alpha, \\beta)$ (figure interactive : faire tourner avec la souris). La solution approchée (point corail) est au fond de la vallée, qui est le minimum de $W$ sur $\\widetilde{\\mathrm{CA}}$ seulement."
+
+echelle = [[0, COULEURS[0]], [0.15, COULEURS[3]], [0.5, "#f3e9f1"], [1, COULEURS[1]]]
+fig = go.Figure()
+fig.add_trace(go.Surface(x=a, y=c, z=Z_tronque, colorscale=echelle,
+                         cmin=-1, cmax=3, opacity=0.95, showscale=False,
+                         name="W"))
+fig.add_trace(go.Scatter3d(x=[1], y=[1], z=[-1], mode="markers",
+                           marker=dict(size=7, color=CORAIL_FONCE),
+                           name="minimum"))
+fig.update_layout(height=560, margin=dict(l=0, r=0, t=10, b=0),
+                  scene=dict(xaxis_title="α / α<sub>opt</sub>", yaxis_title="β / β<sub>opt</sub>",
+                             zaxis_title="W / |W<sub>min</sub>|",
+                             zaxis=dict(range=[-1.2, 3]),
+                             aspectmode="manual", aspectratio=dict(x=1, y=1, z=0.7),
+                             camera=dict(eye=dict(x=-1.6, y=-1.6, z=1.3))),
+                  showlegend=False)
+fig.show()
+```
+:::
+
+::: {.content-visible when-format="pdf"}
+```{python}
+#| label: fig-bloc-energie-iso
+#| fig-cap: "Lignes de niveau de l'énergie potentielle $W(\\alpha, \\beta)/|W_{\\min}|$. La solution approchée (point corail) est au fond de la vallée. La version HTML propose un tracé 3D interactif."
+
+fig = go.Figure()
+fig.add_trace(go.Contour(x=a, y=c, z=Z, contours_coloring="lines",
+                         colorscale=[[0, COULEURS[0]], [1, COULEURS[1]]],
+                         contours=dict(start=-0.9, end=3, size=0.4,
+                                       showlabels=True),
+                         line_width=1.5, showscale=False))
+fig.add_trace(go.Scatter(x=[1], y=[1], mode="markers",
+                         marker=dict(size=11, color=CORAIL_FONCE)))
+fig.update_layout(xaxis_title="α / α<sub>opt</sub>", yaxis_title="β / β<sub>opt</sub>",
+                  height=430, showlegend=False,
+                  margin=dict(l=60, r=20, t=20, b=50))
+fig.show()
+```
+:::
+
+::: {.content-visible when-format="html"}
+**Explorer le paysage énergétique.** Les curseurs font varier $\alpha$ et $\beta$ (rapportés à leurs valeurs optimales). La surface n'est tracée que jusqu'à $W = 3\,|W_{\min}|$ (au-delà, le point reste affiché au sommet). À gauche, le point se déplace sur la surface $W(\alpha, \beta)$. À droite, on voit la déformée (amplifiée) du champ $\vv{u}^{\star} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$ correspondant. Seul le point $(\alpha_{\text{opt}}, \beta_{\text{opt}})$ réalise le minimum de $W$.
+
+```{python}
+#| label: explorateur-energie
+#| code-summary: "Afficher le code de la figure interactive (Plotly + JavaScript)"
+
+import json
+from IPython.display import HTML
+
+donnees = dict(L=L, h=h, K11=K11, K12=K12, K22=K22, F=F,
+               alpha=alpha, beta=beta, Wmin=abs(W_min),
+               ampli=0.15 / abs(beta * L**2),
+               a=list(a), c=list(c), Z=[[None if np.isnan(v) else round(float(v), 4) for v in ligne] for ligne in Z_tronque],
+               couleurs=COULEURS, corail=CORAIL_FONCE)
+
+HTML("""
+<div style="display:flex;flex-wrap:wrap;gap:1.5em;margin:0.5em 0 0.2em 0">
+  <label>α / α<sub>opt</sub> = <span id="val-a">1.00</span><br>
+    <input id="curseur-a" type="range" min="0" max="2" step="0.01" value="1" style="width:220px"></label>
+  <label>β / β<sub>opt</sub> = <span id="val-b">1.00</span><br>
+    <input id="curseur-b" type="range" min="0" max="2" step="0.01" value="1" style="width:220px"></label>
+  <span>W / |W<sub>min</sub>| = <b id="val-w">-1.000</b></span>
+</div>
+<div style="display:flex;flex-wrap:wrap">
+  <div id="paysage-3d" style="flex:1 1 420px;height:440px"></div>
+  <div id="paysage-def" style="flex:1 1 420px;height:440px"></div>
+</div>
+<script>
+(function () {
+  const d = """ + json.dumps(donnees) + """;
+  const W = (al, be) => 0.5 * (d.K11 * al * al + 2 * d.K12 * al * be + d.K22 * be * be)
+                        + be * d.L * d.L * d.F;
+
+  // Déformée : fibres x2 = cste et sections x1 = cste, avec null entre les lignes
+  function deformee(al, be) {
+    const xs = [], ys = [], n = 40;
+    const pos = (x1, x2) => [x1 + d.ampli * al * x1 * x2, x2 + d.ampli * be * x1 * x1];
+    for (const x2 of [-d.h / 2, -d.h / 4, 0, d.h / 4, d.h / 2]) {
+      for (let i = 0; i <= n; i++) { const p = pos(d.L * i / n, x2); xs.push(p[0]); ys.push(p[1]); }
+      xs.push(null); ys.push(null);
+    }
+    for (let i = 0; i <= 12; i++) {
+      for (const x2 of [-d.h / 2, d.h / 2]) { const p = pos(d.L * i / 12, x2); xs.push(p[0]); ys.push(p[1]); }
+      xs.push(null); ys.push(null);
+    }
+    return [xs, ys];
+  }
+
+  const surf = {type: "surface", x: d.a, y: d.c, z: d.Z, showscale: false, opacity: 0.9,
+    cmin: -1, cmax: 3, colorscale: [[0, d.couleurs[0]], [0.15, d.couleurs[3]], [0.5, "#f3e9f1"], [1, d.couleurs[1]]],
+    hoverinfo: "skip"};
+  const point = {type: "scatter3d", mode: "markers", x: [1], y: [1], z: [-1],
+    marker: {size: 7, color: d.corail}};
+  const opt = {type: "scatter3d", mode: "markers", x: [1], y: [1], z: [-1],
+    marker: {size: 4, color: d.couleurs[2], symbol: "diamond"}};
+  Plotly.newPlot("paysage-3d", [surf, opt, point], {
+    margin: {l: 0, r: 0, t: 10, b: 0}, showlegend: false,
+    scene: {xaxis: {title: {text: "α / α<sub>opt</sub>"}}, yaxis: {title: {text: "β / β<sub>opt</sub>"}},
+            zaxis: {title: {text: "W / |W<sub>min</sub>|"}, range: [-1.2, 3]},
+            aspectmode: "manual", aspectratio: {x: 1, y: 1, z: 0.7},
+            camera: {eye: {x: -1.6, y: -1.6, z: 1.3}}},
+    paper_bgcolor: "rgba(0,0,0,0)"}, {responsive: true, displaylogo: false});
+
+  const ref = deformee(0, 0), opt_def = deformee(d.alpha, d.beta), cur = deformee(d.alpha, d.beta);
+  Plotly.newPlot("paysage-def", [
+    {x: ref[0], y: ref[1], mode: "lines", line: {color: "#b8b5c4", width: 1}, name: "initiale"},
+    {x: opt_def[0], y: opt_def[1], mode: "lines", line: {color: d.couleurs[2], width: 1, dash: "dot"}, name: "minimum de W"},
+    {x: cur[0], y: cur[1], mode: "lines", line: {color: d.corail, width: 2}, name: "champ (α, β) choisi"}
+  ], {
+    margin: {l: 50, r: 10, t: 30, b: 40},
+    xaxis: {title: {text: "x₁"}, range: [-0.05, 1.25]},
+    yaxis: {title: {text: "x₂"}, range: [-0.5, 0.3], scaleanchor: "x", scaleratio: 1},
+    legend: {orientation: "h", y: 1.1}, paper_bgcolor: "rgba(0,0,0,0)"},
+    {responsive: true, displaylogo: false});
+
+  function maj() {
+    const ra = parseFloat(document.getElementById("curseur-a").value);
+    const rb = parseFloat(document.getElementById("curseur-b").value);
+    const al = ra * d.alpha, be = rb * d.beta, w = W(al, be) / d.Wmin;
+    document.getElementById("val-a").textContent = ra.toFixed(2);
+    document.getElementById("val-b").textContent = rb.toFixed(2);
+    document.getElementById("val-w").textContent = w.toFixed(3);
+    Plotly.restyle("paysage-3d", {x: [[ra]], y: [[rb]], z: [[Math.min(w, 3)]]}, [2]);
+    const p = deformee(al, be);
+    Plotly.restyle("paysage-def", {x: [p[0]], y: [p[1]]}, [2]);
+  }
+  document.getElementById("curseur-a").addEventListener("input", maj);
+  document.getElementById("curseur-b").addEventListener("input", maj);
+})();
+</script>
+""")
+```
+:::
+
+### Comparaison avec une solution éléments finis {#sec-bloc-fem}
+
+Les bords latéraux glissants imposent $u_3 = 0$ et rendent le problème plan ($\varepsilon_{i3} = 0$) : on peut le résoudre en **déformations planes** dans le plan $(x_1, x_2)$. On le fait ici avec une méthode des éléments finis volontairement minimale, en quelques lignes de `numpy` : $24$ quadrangles bilinéaires ($12$ dans la longueur, $2$ dans l'épaisseur), et un cisaillement $\tau$ uniforme sur le bord droit. Le principe est exactement celui de la @sec-energie-potentielle : on minimise $W$ sur un sous-espace $\widetilde{\mathrm{CA}}$ de dimension finie, celui des champs continus et bilinéaires par élément. Un maillage beaucoup plus fin ($80 \times 16$ éléments) sert de référence.
+
+```{python}
+#| label: fem-bloc
+#| code-summary: "Afficher le code éléments finis (numpy)"
+
+# Données et solution approchée : voir le code du paysage énergétique
+
+def elements_finis(nx, ny):
+    """Bloc encastré en x1 = 0, cisaillement uniforme en x1 = L.
+    Quadrangles bilinéaires (Q4), déformations planes."""
+    # 1) Maillage : noeud (i, j) -> numéro i*(ny+1) + j
+    xs = np.linspace(0, L, nx + 1)
+    ys = np.linspace(-h / 2, h / 2, ny + 1)
+    noeuds = np.array([[x, y] for x in xs for y in ys])
+    num = lambda i, j: i * (ny + 1) + j
+    elements = [[num(i, j), num(i + 1, j), num(i + 1, j + 1), num(i, j + 1)]
+                for i in range(nx) for j in range(ny)]
+
+    # 2) Loi de Hooke en déformations planes (Voigt : e11, e22, 2 e12)
+    C = np.array([[lam + 2 * mu, lam, 0],
+                  [lam, lam + 2 * mu, 0],
+                  [0, 0, mu]])
+
+    # 3) Matrice de rigidité : K = somme des int( B^T C B ) (Gauss 2x2)
+    K = np.zeros((2 * len(noeuds), 2 * len(noeuds)))
+    g = 1 / np.sqrt(3)
+    for el in elements:
+        xe = noeuds[el]
+        Ke = np.zeros((8, 8))
+        for xi in (-g, g):
+            for eta in (-g, g):
+                # dérivées des 4 fonctions de forme sur l'élément de référence
+                dN = 0.25 * np.array([[-(1 - eta), 1 - eta, 1 + eta, -(1 + eta)],
+                                      [-(1 - xi), -(1 + xi), 1 + xi, 1 - xi]])
+                J = dN @ xe                      # jacobien
+                dNx = np.linalg.solve(J, dN)     # dérivées en (x1, x2)
+                B = np.zeros((3, 8))             # eps = B u_e
+                B[0, 0::2] = dNx[0]
+                B[1, 1::2] = dNx[1]
+                B[2, 0::2] = dNx[1]
+                B[2, 1::2] = dNx[0]
+                Ke += B.T @ C @ B * np.linalg.det(J) * b
+        ddl = np.ravel([[2 * n, 2 * n + 1] for n in el])
+        K[np.ix_(ddl, ddl)] += Ke
+
+    # 4) Efforts nodaux : tau = -F/(b h) réparti sur les noeuds de x1 = L
+    f = np.zeros(2 * len(noeuds))
+    tau, dy = -F / (b * h), h / ny
+    for j in range(ny):
+        for n in (num(nx, j), num(nx, j + 1)):
+            f[2 * n + 1] += tau * b * dy / 2
+
+    # 5) Encastrement (u = 0 en x1 = 0) et résolution de K u = f
+    bloques = np.ravel([[2 * num(0, j), 2 * num(0, j) + 1] for j in range(ny + 1)])
+    libres = np.setdiff1d(np.arange(2 * len(noeuds)), bloques)
+    u = np.zeros(2 * len(noeuds))
+    u[libres] = np.linalg.solve(K[np.ix_(libres, libres)], f[libres])
+    return noeuds, elements, u.reshape(-1, 2)
+
+
+noeuds, elements, u_ef = elements_finis(12, 2)          # 24 éléments
+noeuds_ref, _, u_ref = elements_finis(80, 16)           # référence fine
+```
+
+```{python}
+#| label: fig-bloc-fleche
+#| fig-cap: "Bloc encastré en flexion simple : flèche $u_2(x_1, 0)$ le long de la fibre moyenne, rapportée à la flèche de la théorie des poutres $F L^3/(3 E I)$. La solution approchée à deux paramètres et la solution éléments finis à 24 éléments sont toutes deux plus raides que la référence : elles minimisent $W$ sur un sous-espace de CA."
+
+fleche_poutre = F * L**3 / (3 * E * b * h**3 / 12)
+x1 = np.linspace(0, L, 200)
+
+def fibre_moyenne(noeuds, u):
+    sel = np.isclose(noeuds[:, 1], 0)
+    return noeuds[sel, 0], u[sel, 1]
+
+fig = go.Figure()
+xr, ur = fibre_moyenne(noeuds_ref, u_ref)
+fig.add_trace(go.Scatter(x=xr, y=ur / fleche_poutre, mode="lines",
+                         name="EF 80 × 16 (référence)",
+                         line=dict(color=COULEURS[2], width=2, dash="dash")))
+xe, ue = fibre_moyenne(noeuds, u_ef)
+fig.add_trace(go.Scatter(x=xe, y=ue / fleche_poutre, mode="lines+markers",
+                         name="EF 24 éléments",
+                         line=dict(color=COULEURS[0], width=2.5)))
+fig.add_trace(go.Scatter(x=x1, y=beta * x1**2 / fleche_poutre, mode="lines",
+                         name="Solution approchée (α, β)",
+                         line=dict(color=CORAIL_FONCE, width=2.5)))
+fig.update_layout(xaxis_title="x₁ / L", yaxis_title="u₂(x₁, 0) / (F L³ / 3EI)",
+                  height=420, legend=dict(x=0.02, y=0.05),
+                  margin=dict(l=60, r=20, t=20, b=50))
+fig.show()
+```
+
+```{python}
+#| label: fig-bloc-deformee
+#| fig-cap: "Déformées (amplifiées) du bloc : maillage éléments finis à 24 éléments (bleu) et solution approchée $\\tilde{\\vv{u}} = \\alpha\\,x_1 x_2\\,\\vv{e}_1 + \\beta\\,x_1^2\\,\\vv{e}_2$ (corail), sur la configuration initiale (gris)."
+
+ampli = 0.15 / abs(u_ref[:, 1]).max()   # amplification de l'affichage
+
+def contour(el, pos):
+    p = pos[el + [el[0]]]
+    return list(p[:, 0]) + [None], list(p[:, 1]) + [None]
+
+def traces_maillage(pos, couleur, nom, largeur=1.5):
+    xs, ys = [], []
+    for el in elements:
+        cx, cy = contour(el, pos)
+        xs += cx
+        ys += cy
+    return go.Scatter(x=xs, y=ys, mode="lines", name=nom,
+                      line=dict(color=couleur, width=largeur))
+
+u_ritz = np.column_stack([alpha * noeuds[:, 0] * noeuds[:, 1],
+                          beta * noeuds[:, 0]**2])
+
+fig = go.Figure()
+fig.add_trace(traces_maillage(noeuds, "#b8b5c4", "Configuration initiale", 1))
+fig.add_trace(traces_maillage(noeuds + ampli * u_ef, COULEURS[0], "EF 24 éléments"))
+fig.add_trace(traces_maillage(noeuds + ampli * u_ritz, CORAIL_FONCE, "Solution approchée (α, β)"))
+fig.update_layout(xaxis_title="x₁", yaxis_title="x₂", height=380,
+                  yaxis=dict(scaleanchor="x", scaleratio=1),
+                  legend=dict(orientation="h", y=1.08, x=0),
+                  margin=dict(l=60, r=20, t=40, b=50))
+fig.show()
+```

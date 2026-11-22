@@ -6,6 +6,7 @@ format:
     resources:
       - "notes/elasticite_2026_10_22.pdf"
       - "notes/elasticite_2026_11_06.pdf"
+      - "notes/elasticite_2026_11_20.pdf"
   pdf:
     output-file: elasticite.pdf
 ---
@@ -87,3 +88,11 @@ CORAIL_FONCE = "#d6455a"
 # Séance 2 — Critères de limite élastique et techniques de résolution analytique {#sec-seance2}
 
 {{< include seances/_seance2.qmd >}}
+
+# Séance 3 {#sec-seance3}
+
+*Rédaction à venir.*
+
+# Séance 4 — Méthodes énergétiques : travaux virtuels et énergie potentielle {#sec-seance4}
+
+{{< include seances/_seance4.qmd >}}
