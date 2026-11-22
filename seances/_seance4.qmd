@@ -49,20 +49,20 @@ $$
 $$
 \vv{u}^{\star} = \vv{u}_d \quad \text{sur } \partial\Omega_u .
 $$
-- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{\circ} \in \left[H^1(\Omega)\right]^3$ est dit CA0 si et seulement si
+- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{0} \in \left[H^1(\Omega)\right]^3$ est dit CA0 si et seulement si
 $$
-\vv{u}^{\circ} = \vv{0} \quad \text{sur } \partial\Omega_u .
+\vv{u}^{0} = \vv{0} \quad \text{sur } \partial\Omega_u .
 $$
 :::
 
 ::: {.callout-note}
 ### Remarque : CA0 = variations admissibles
 
-Si l'on part d'un champ $\vv{u} \in \mathrm{CA}$ que l'on perturbe pour obtenir un autre champ $\vv{u}^{\star} \in \mathrm{CA}$, la **variation** $\vv{u}^{\circ} = \vv{u}^{\star} - \vv{u}$ vérifie $\vv{u}^{\circ} = \vv{u}_d - \vv{u}_d = \vv{0}$ sur $\partial\Omega_u$, donc $\vv{u}^{\circ} \in \mathrm{CA}_0$.
+Si l'on part d'un champ $\vv{u} \in \mathrm{CA}$ que l'on perturbe pour obtenir un autre champ $\vv{u}^{\star} \in \mathrm{CA}$, la **variation** $\vv{u}^{0} = \vv{u}^{\star} - \vv{u}$ vérifie $\vv{u}^{0} = \vv{u}_d - \vv{u}_d = \vv{0}$ sur $\partial\Omega_u$, donc $\vv{u}^{0} \in \mathrm{CA}_0$.
 
-Un champ $\vv{u}^{\circ} \in \mathrm{CA}_0$ représente donc une **variation admissible** du déplacement autour d'un champ $\vv{u} \in \mathrm{CA}$ :
+Un champ $\vv{u}^{0} \in \mathrm{CA}_0$ représente donc une **variation admissible** du déplacement autour d'un champ $\vv{u} \in \mathrm{CA}$ :
 $$
-\forall h \in \mathbb{R}, \qquad \vv{u} + h\,\vv{u}^{\circ} \in \mathrm{CA} .
+\forall h \in \mathbb{R}, \qquad \vv{u} + h\,\vv{u}^{0} \in \mathrm{CA} .
 $$
 :::
 
@@ -71,23 +71,23 @@ $$
 ::: {.callout-important}
 ### Principe des travaux virtuels
 
-Un champ de contrainte $\sig^{\star}$ (symétrique) est SA si et seulement si le travail de $\sig^{\star}$ dans la déformation $\eps(\vv{u}^{\circ})$ associée à **toute** variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ est égal au travail des efforts extérieurs donnés dans ce même champ $\vv{u}^{\circ}$ :
+Un champ de contrainte $\sig^{\star}$ (symétrique) est SA si et seulement si le travail de $\sig^{\star}$ dans la déformation $\eps(\vv{u}^{0})$ associée à **toute** variation virtuelle $\vv{u}^{0} \in \mathrm{CA}_0$ est égal au travail des efforts extérieurs donnés dans ce même champ $\vv{u}^{0}$ :
 $$
 \sig^{\star} \in \mathrm{SA}
 \quad\Longleftrightarrow\quad
-\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{\circ}),
-\qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{0})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{0}),
+\qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0,
 $$ {#eq-ptv}
 où
 $$
-W_{\text{ext}}(\vv{u}^{\circ}) := \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V + \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{\circ}\,\mathrm{d}S .
+W_{\text{ext}}(\vv{u}^{0}) := \int_\Omega \vv{f}_v\cdot\vv{u}^{0}\,\mathrm{d}V + \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{0}\,\mathrm{d}S .
 $$
 :::
 
 ::: {.callout-note}
 ### Remarques
 
-- Puisqu'on s'intéresse au travail de variations $\vv{u}^{\circ} \in \mathrm{CA}_0$ (donc nulles sur $\partial\Omega_u$), le travail des efforts de réaction (inconnus) est nul : ces efforts n'apparaissent pas dans $W_{\text{ext}}$, seuls les efforts **connus** y apparaissent.
+- Puisqu'on s'intéresse au travail de variations $\vv{u}^{0} \in \mathrm{CA}_0$ (donc nulles sur $\partial\Omega_u$), le travail des efforts de réaction (inconnus) est nul : ces efforts n'apparaissent pas dans $W_{\text{ext}}$, seuls les efforts **connus** y apparaissent.
 - Le principe des puissances virtuelles vu en MMC s'écrit avec des champs de vitesses virtuelles **quelconques** (l'énoncé étant linéaire par rapport au champ virtuel, vitesses et déplacements virtuels sont interchangeables). Le cours de MMC donne donc une version plus générale du PTV, où le champ virtuel $\hat{\vv{v}}$ est **quelconque**, sans condition sur $\partial\Omega_u$. Le travail des efforts extérieurs doit alors inclure celui des réactions exercées sur $\partial\Omega_u$, **inconnues**, de densité surfacique $\vv{R}$ :
   $$
   \int_\Omega \sig : \eps(\hat{\vv{v}})\,\mathrm{d}V =
@@ -96,17 +96,17 @@ $$
   \int_{\partial\Omega_u} \vv{R}\cdot\hat{\vv{v}}\,\mathrm{d}S,
   \qquad \forall\,\hat{\vv{v}} \in H^1(\Omega)^3 .
   $$
-  La démonstration du PTV (@sec-preuve-ptv) donne alors $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$ et $\sig\,\vv{n} = \vv{R}$ sur $\partial\Omega_u$ : la relation $\vv{R} = \sig\,\vv{n}$ est une **conséquence** du PTV général. Réciproquement, si l'on prend $\vv{R} = \sig\,\vv{n}$ pour acquis, se restreindre à $\vv{u}^{\circ} \in \mathrm{CA}_0$ ne fait perdre aucune information. Le terme en $\vv{R}$ disparaît, on résout le problème sans connaître les réactions, puis on les calcule **a posteriori** par $\vv{R} = \sig\,\vv{n}$.
+  La démonstration du PTV (@sec-preuve-ptv) donne alors $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$ et $\sig\,\vv{n} = \vv{R}$ sur $\partial\Omega_u$ : la relation $\vv{R} = \sig\,\vv{n}$ est une **conséquence** du PTV général. Réciproquement, si l'on prend $\vv{R} = \sig\,\vv{n}$ pour acquis, se restreindre à $\vv{u}^{0} \in \mathrm{CA}_0$ ne fait perdre aucune information. Le terme en $\vv{R}$ disparaît, on résout le problème sans connaître les réactions, puis on les calcule **a posteriori** par $\vv{R} = \sig\,\vv{n}$.
 
   Faire travailler tous les efforts, y compris ceux de réaction ou d'interface (le PTV général), devient indispensable lorsque la condition locale n'est plus aussi intuitive que $\vv{R} = \sig\,\vv{n}$, par exemple pour une **interface dotée de sa propre énergie** (tension de surface, front de changement de phase, interface cohésive), où c'est le PTV qui fournit la condition de saut à l'interface.
   <!-- Le PTV, complété du travail virtuel de l'interface, donne alors une condition de saut du type $[\![\sig]\!]\,\vv{n} + \dive_s\tsd{\sigma}_s = \vv{0}$ (loi de Young-Laplace généralisée, $\tsd{\sigma}_s$ étant la contrainte de surface), moins évidente à deviner que la simple continuité $[\![\sig]\!]\,\vv{n} = \vv{0}$. -->
-- Les équations locales d'équilibre sont remplacées par une **formulation intégrale** (formulation variationnelle, ou **forme faible**). Plutôt que de vérifier l'équilibre en tout point, on impose la nullité du travail virtuel total pour toute variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ de déplacement.
+- Les équations locales d'équilibre sont remplacées par une **formulation intégrale** (formulation variationnelle, ou **forme faible**). Plutôt que de vérifier l'équilibre en tout point, on impose la nullité du travail virtuel total pour toute variation virtuelle $\vv{u}^{0} \in \mathrm{CA}_0$ de déplacement.
 - Le PTV ne fait intervenir **aucune loi de comportement** : l'équivalence « $\sig^{\star}$ SA $\Longleftrightarrow$ PTV » est de la pure statique, valable pour tout matériau, élastique ou non. Le comportement n'intervient que dans l'énergie potentielle $W$ (@sec-energie-potentielle), à travers $\Cel$.
-- Quand une énergie potentielle $W$ existe, l'équilibre s'écrit comme la **stationnarité** de $W$ dans toutes les directions admissibles $\vv{u}^{\circ}$ :
+- Quand une énergie potentielle $W$ existe, l'équilibre s'écrit comme la **stationnarité** de $W$ dans toutes les directions admissibles $\vv{u}^{0}$ :
 $$
-DW(\vv{u})(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
+DW(\vv{u})(\vv{u}^{0}) = 0, \qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0,
 $$
-où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{\circ}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle). Le PTV reste toutefois valable qu'une telle énergie existe ou non.
+où $DW(\vv{u})(\vv{u}^{0})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{0}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle). Le PTV reste toutefois valable qu'une telle énergie existe ou non.
 :::
 
 ::: {.callout-tip}
@@ -128,9 +128,9 @@ E_p'(u)\,\delta u = 0 \quad \forall\,\delta u
 \qquad\Longrightarrow\qquad
 (k\,u - F)\,\delta u = 0 \quad \forall\,\delta u .
 $$
-La quantité $\delta u$ est ce que l'on va appeler un **déplacement virtuel** : elle « teste » cette direction. On peut poser $\delta u = h\,u^{\circ}$ et, puisque l'équation est linéaire, on retrouve
+La quantité $\delta u$ est ce que l'on va appeler un **déplacement virtuel** : elle « teste » cette direction. On peut poser $\delta u = h\,u^{0}$ et, puisque l'équation est linéaire, on retrouve
 $$
-(k\,u - F)\,u^{\circ} = 0 \qquad \forall\,u^{\circ} .
+(k\,u - F)\,u^{0} = 0 \qquad \forall\,u^{0} .
 $$
 
 En 1D, garder $\delta u$ et pas juste $E_p' = 0$ est artificiel, mais en mécanique des milieux continus on ne peut pas dériver $E_p$ par rapport à l'infinité de valeurs $\vv{u}(\vv{x})$ en tout point : d'où la notion de **dérivée de Gâteaux** (@sec-gateaux).
@@ -141,29 +141,29 @@ En 1D, garder $\delta u$ et pas juste $E_p' = 0$ est artificiel, mais en mécani
 ::: {.callout-note collapse="false"}
 ### Démonstration : $\sig^{\star} \in \mathrm{SA} \Longrightarrow$ PTV
 
-Soit $\sig^{\star} \in \mathrm{SA}$ et $\vv{u}^{\circ} \in \mathrm{CA}_0$. L'équilibre donne
+Soit $\sig^{\star} \in \mathrm{SA}$ et $\vv{u}^{0} \in \mathrm{CA}_0$. L'équilibre donne
 $$
 \dive\sig^{\star} + \vv{f}_v = \vv{0}
 \;\Longrightarrow\;
-\dive\sig^{\star}\cdot\vv{u}^{\circ} + \vv{f}_v\cdot\vv{u}^{\circ} = 0
+\dive\sig^{\star}\cdot\vv{u}^{0} + \vv{f}_v\cdot\vv{u}^{0} = 0
 \;\Longrightarrow\;
-\int_\Omega \left(\dive\sig^{\star}\cdot\vv{u}^{\circ} + \vv{f}_v\cdot\vv{u}^{\circ}\right)\mathrm{d}V = 0 .
+\int_\Omega \left(\dive\sig^{\star}\cdot\vv{u}^{0} + \vv{f}_v\cdot\vv{u}^{0}\right)\mathrm{d}V = 0 .
 $$
 On rappelle que (en notation d'Einstein, avec $\sig$ symétrique)
 $$
-\dive\left(\sig\,\vv{u}^{\circ}\right) = \left(\sigma_{ij}\,u^{\circ}_j\right)_{,i}
-= \sigma_{ij,i}\,u^{\circ}_j + \sigma_{ij}\,u^{\circ}_{j,i}
-= \underbrace{\sigma_{ji,i}\,u^{\circ}_j}_{\dive\sig\cdot\vv{u}^{\circ}} + \underbrace{\sigma_{ij}\,u^{\circ}_{j,i}}_{\sig : \tsd{\nabla}\vv{u}^{\circ}} ,
+\dive\left(\sig\,\vv{u}^{0}\right) = \left(\sigma_{ij}\,u^{0}_j\right)_{,i}
+= \sigma_{ij,i}\,u^{0}_j + \sigma_{ij}\,u^{0}_{j,i}
+= \underbrace{\sigma_{ji,i}\,u^{0}_j}_{\dive\sig\cdot\vv{u}^{0}} + \underbrace{\sigma_{ij}\,u^{0}_{j,i}}_{\sig : \tsd{\nabla}\vv{u}^{0}} ,
 $$
 d'où
 $$
-\int_\Omega \dive\left(\sig^{\star}\vv{u}^{\circ}\right)\mathrm{d}V - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0 .
+\int_\Omega \dive\left(\sig^{\star}\vv{u}^{0}\right)\mathrm{d}V - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{0}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{0}\,\mathrm{d}V = 0 .
 $$
 Par le théorème de Green (flux-divergence),
 $$
-\int_{\partial\Omega} \left(\sig^{\star}\vv{n}\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0 .
+\int_{\partial\Omega} \left(\sig^{\star}\vv{n}\right)\cdot\vv{u}^{0}\,\mathrm{d}S - \int_\Omega \sig^{\star} : \tsd{\nabla}\vv{u}^{0}\,\mathrm{d}V + \int_\Omega \vv{f}_v\cdot\vv{u}^{0}\,\mathrm{d}V = 0 .
 $$
-Par symétrie de $\sig^{\star}$, $\sig^{\star} : \tsd{\nabla}\vv{u}^{\circ} = \sig^{\star} : \eps(\vv{u}^{\circ})$. En effet,
+Par symétrie de $\sig^{\star}$, $\sig^{\star} : \tsd{\nabla}\vv{u}^{0} = \sig^{\star} : \eps(\vv{u}^{0})$. En effet,
 $$
 \sig : \tsd{\nabla}\vv{u} = \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j} + \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j}
 = \tfrac{1}{2}\,\sigma_{ij}\,u_{i,j} + \tfrac{1}{2}\,\underbrace{\sigma_{ji}\,u_{i,j}}_{=\,\sigma_{ij}\,u_{j,i}}
@@ -171,10 +171,10 @@ $$
 $$
 Soit, en séparant $\partial\Omega = \partial\Omega_u \cup \partial\Omega_f$ :
 $$
-\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V
-= \underbrace{\int_{\partial\Omega_u} \left(\sig^{\star}\vv{n}\right)\cdot\underbrace{\vv{u}^{\circ}}_{=\,\vv{0}}\,\mathrm{d}S}_{=\,0}
-+ \underbrace{\int_{\partial\Omega_f} \underbrace{\left(\sig^{\star}\vv{n}\right)}_{=\,\vv{f}_s}\cdot\vv{u}^{\circ}\,\mathrm{d}S
-+ \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V}_{W_{\text{ext}}(\vv{u}^{\circ})} .
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{0})\,\mathrm{d}V
+= \underbrace{\int_{\partial\Omega_u} \left(\sig^{\star}\vv{n}\right)\cdot\underbrace{\vv{u}^{0}}_{=\,\vv{0}}\,\mathrm{d}S}_{=\,0}
++ \underbrace{\int_{\partial\Omega_f} \underbrace{\left(\sig^{\star}\vv{n}\right)}_{=\,\vv{f}_s}\cdot\vv{u}^{0}\,\mathrm{d}S
++ \int_\Omega \vv{f}_v\cdot\vv{u}^{0}\,\mathrm{d}V}_{W_{\text{ext}}(\vv{u}^{0})} .
 $$
 :::
 
@@ -183,20 +183,20 @@ $$
 
 On suppose
 $$
-\int_\Omega \sig^{\star} : \eps(\vv{u}^{\circ})\,\mathrm{d}V - \int_\Omega \vv{f}_v\cdot\vv{u}^{\circ}\,\mathrm{d}V - \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{\circ}\,\mathrm{d}S = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+\int_\Omega \sig^{\star} : \eps(\vv{u}^{0})\,\mathrm{d}V - \int_\Omega \vv{f}_v\cdot\vv{u}^{0}\,\mathrm{d}V - \int_{\partial\Omega_f} \vv{f}_s\cdot\vv{u}^{0}\,\mathrm{d}S = 0, \qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0 .
 $$
-De même, $\sig^{\star}$ étant symétrique, $\sig^{\star} : \eps(\vv{u}^{\circ}) = \sig^{\star} : \tsd{\nabla}\vv{u}^{\circ} = \dive\left(\sig^{\star}\vv{u}^{\circ}\right) - \dive\sig^{\star}\cdot\vv{u}^{\circ}$, d'où, avec le théorème de Green et puisque $\vv{u}^{\circ} = \vv{0}$ sur $\partial\Omega_u$ (le terme de bord se réduit à $\int_{\partial\Omega_f}(\sig^{\star}\vv{n})\cdot\vv{u}^{\circ}\,\mathrm{d}S$) :
+De même, $\sig^{\star}$ étant symétrique, $\sig^{\star} : \eps(\vv{u}^{0}) = \sig^{\star} : \tsd{\nabla}\vv{u}^{0} = \dive\left(\sig^{\star}\vv{u}^{0}\right) - \dive\sig^{\star}\cdot\vv{u}^{0}$, d'où, avec le théorème de Green et puisque $\vv{u}^{0} = \vv{0}$ sur $\partial\Omega_u$ (le terme de bord se réduit à $\int_{\partial\Omega_f}(\sig^{\star}\vv{n})\cdot\vv{u}^{0}\,\mathrm{d}S$) :
 $$
-\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S
-- \int_\Omega \left(\dive\sig^{\star} + \vv{f}_v\right)\cdot\vv{u}^{\circ}\,\mathrm{d}V = 0,
-\qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{0}\,\mathrm{d}S
+- \int_\Omega \left(\dive\sig^{\star} + \vv{f}_v\right)\cdot\vv{u}^{0}\,\mathrm{d}V = 0,
+\qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0 .
 $$
-Donc, **en choisissant judicieusement** les $\vv{u}^{\circ}$, on peut montrer la relocalisation des équations en utilisant le **lemme fondamental du calcul des variations** : il faut choisir pour $\Omega$ (resp. $\partial\Omega_f$) une « bosse » nulle sur $\partial\Omega$ (resp. sur le reste du bord), centrée sur un point de $\Omega$ (resp. $\partial\Omega_f$), pour relocaliser.
+Donc, **en choisissant judicieusement** les $\vv{u}^{0}$, on peut montrer la relocalisation des équations en utilisant le **lemme fondamental du calcul des variations** : il faut choisir pour $\Omega$ (resp. $\partial\Omega_f$) une « bosse » nulle sur $\partial\Omega$ (resp. sur le reste du bord), centrée sur un point de $\Omega$ (resp. $\partial\Omega_f$), pour relocaliser.
 
-1. Des $\vv{u}^{\circ}$ nuls sur tout $\partial\Omega$, concentrés autour d'un point de $\Omega$ : le terme de bord disparaît, et il reste $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ dans $\Omega$.
-2. On réinjecte ce résultat : il ne reste que $\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{\circ}\,\mathrm{d}S = 0$, et des $\vv{u}^{\circ}$ concentrés près d'un point de $\partial\Omega_f$ donnent $\sig^{\star}\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$.
+1. Des $\vv{u}^{0}$ nuls sur tout $\partial\Omega$, concentrés autour d'un point de $\Omega$ : le terme de bord disparaît, et il reste $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ dans $\Omega$.
+2. On réinjecte ce résultat : il ne reste que $\int_{\partial\Omega_f} \left(\sig^{\star}\vv{n} - \vv{f}_s\right)\cdot\vv{u}^{0}\,\mathrm{d}S = 0$, et des $\vv{u}^{0}$ concentrés près d'un point de $\partial\Omega_f$ donnent $\sig^{\star}\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$.
 
-Par exemple, avec $\varphi \geq 0$ une bosse nulle sur $\partial\Omega$, le choix $\vv{u}^{\circ} = \varphi\left(\dive\sig^{\star} + \vv{f}_v\right)$ donne $\int_\Omega \varphi\,\left|\dive\sig^{\star} + \vv{f}_v\right|^2\mathrm{d}V = 0$, donc $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ là où $\varphi > 0$.
+Par exemple, avec $\varphi \geq 0$ une bosse nulle sur $\partial\Omega$, le choix $\vv{u}^{0} = \varphi\left(\dive\sig^{\star} + \vv{f}_v\right)$ donne $\int_\Omega \varphi\,\left|\dive\sig^{\star} + \vv{f}_v\right|^2\mathrm{d}V = 0$, donc $\dive\sig^{\star} + \vv{f}_v = \vv{0}$ là où $\varphi > 0$.
 :::
 
 ### Théorème d'unicité {#sec-unicite}
@@ -215,13 +215,13 @@ En élasticité linéaire (et, plus généralement, en HPP avec une énergie con
 
 Soient deux solutions distinctes $(\vv{u}^1, \sig^1)$ et $(\vv{u}^2, \sig^2) \in \mathrm{CA}\times\mathrm{SA}$. Le PTV donne, pour $i \in \{1, 2\}$,
 $$
-\int_\Omega \eps(\vv{u}^i) : \Cel : \eps(\vv{u}^{\circ})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{\circ}), \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+\int_\Omega \eps(\vv{u}^i) : \Cel : \eps(\vv{u}^{0})\,\mathrm{d}V = W_{\text{ext}}(\vv{u}^{0}), \qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0 .
 $$
 Par linéarité, en faisant la différence (1) − (2) :
 $$
-\int_\Omega \eps(\vv{u}^1 - \vv{u}^2) : \Cel : \eps(\vv{u}^{\circ})\,\mathrm{d}V = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+\int_\Omega \eps(\vv{u}^1 - \vv{u}^2) : \Cel : \eps(\vv{u}^{0})\,\mathrm{d}V = 0, \qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0 .
 $$
-On peut notamment prendre $\vv{u}^{\circ} = \vv{u}^1 - \vv{u}^2$ (qui est bien CA0) :
+On peut notamment prendre $\vv{u}^{0} = \vv{u}^1 - \vv{u}^2$ (qui est bien CA0) :
 $$
 \int_\Omega \underbrace{\eps(\vv{u}^1 - \vv{u}^2) : \Cel : \eps(\vv{u}^1 - \vv{u}^2)}_{\geq\,0}\,\mathrm{d}V = 0 .
 $$
@@ -336,17 +336,17 @@ Donc $W(\vv{u}^{\star}) \geq W(\vv{u})$ pour tout $\vv{u}^{\star} \in \mathrm{CA
 
 #### Dérivée de Gâteaux {#sec-gateaux}
 
-$\vv{u}(\vv{x})$ étant de dimension possiblement infinie, on introduit une **dérivée directionnelle** : la dérivée de Gâteaux. Plutôt que de dériver par rapport à $\vv{u}$, on se donne une **direction** $\vv{u}^{\circ}$ dans laquelle on étudie la variation de $W$ :
+$\vv{u}(\vv{x})$ étant de dimension possiblement infinie, on introduit une **dérivée directionnelle** : la dérivée de Gâteaux. Plutôt que de dériver par rapport à $\vv{u}$, on se donne une **direction** $\vv{u}^{0}$ dans laquelle on étudie la variation de $W$ :
 $$
-h \longmapsto W(\vv{u} + h\,\vv{u}^{\circ}), \qquad h \in \mathbb{R} \text{ (un scalaire)} .
+h \longmapsto W(\vv{u} + h\,\vv{u}^{0}), \qquad h \in \mathbb{R} \text{ (un scalaire)} .
 $$
 
 ::: {.callout-important}
 ### Définition : dérivée de Gâteaux
 
-La dérivée de $W$ en $\vv{u}$ dans la direction $\vv{u}^{\circ}$ est
+La dérivée de $W$ en $\vv{u}$ dans la direction $\vv{u}^{0}$ est
 $$
-DW(\vv{u})(\vv{u}^{\circ}) = \lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})}{h} .
+DW(\vv{u})(\vv{u}^{0}) = \lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{0}) - W(\vv{u})}{h} .
 $$
 En un minimum, la dérivée de Gâteaux est **nulle dans toutes les directions** (admissibles).
 :::
@@ -356,9 +356,9 @@ En un minimum, la dérivée de Gâteaux est **nulle dans toutes les directions**
 
 Pour le ressort, $W(u) = \frac{1}{2}\,k\,u^2 - F\,u$ et
 $$
-W(u + h\,u^{\circ}) = W(u) + h\,(k\,u - F)\,u^{\circ} + \frac{h^2}{2}\,k\,{u^{\circ}}^2 ,
+W(u + h\,u^{0}) = W(u) + h\,(k\,u - F)\,u^{0} + \frac{h^2}{2}\,k\,{u^{0}}^2 ,
 $$
-d'où $DW(u)(u^{\circ}) = (k\,u - F)\,u^{\circ}$. Le terme en $h$ (la pente) donne la stationnarité, c'est-à-dire le PTV, et le terme en $h^2$ (la courbure, positive car $k > 0$) donne le minimum.
+d'où $DW(u)(u^{0}) = (k\,u - F)\,u^{0}$. Le terme en $h$ (la pente) donne la stationnarité, c'est-à-dire le PTV, et le terme en $h^2$ (la courbure, positive car $k > 0$) donne le minimum.
 :::
 
 #### Démonstration : énergie minimale $\Longrightarrow$ équilibre {#sec-preuve-equilibre}
@@ -366,24 +366,24 @@ d'où $DW(u)(u^{\circ}) = (k\,u - F)\,u^{\circ}$. Le terme en $h$ (la pente) don
 ::: {.callout-note collapse="false"}
 ### Démonstration
 
-On considère une variation $\vv{u} + h\,\vv{u}^{\circ}$ autour du minimum $\vv{u}$, avec $\vv{u} \in \mathrm{CA}$ et $\vv{u}^{\circ} \in \mathrm{CA}_0$, d'où $\vv{u} + h\,\vv{u}^{\circ} \in \mathrm{CA}$.
+On considère une variation $\vv{u} + h\,\vv{u}^{0}$ autour du minimum $\vv{u}$, avec $\vv{u} \in \mathrm{CA}$ et $\vv{u}^{0} \in \mathrm{CA}_0$, d'où $\vv{u} + h\,\vv{u}^{0} \in \mathrm{CA}$.
 
 $\vv{u}$ est un minimum, donc la dérivée de Gâteaux est nulle dans toutes les directions :
 $$
-\lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})}{h} = 0 .
+\lim_{h\to 0} \frac{W(\vv{u} + h\,\vv{u}^{0}) - W(\vv{u})}{h} = 0 .
 $$
 En développant l'énergie élastique (grande symétrie de $\Cel$) et par linéarité de $W_{\text{ext}}$,
 $$
-W(\vv{u} + h\,\vv{u}^{\circ}) - W(\vv{u})
-= h\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ})\right] + h^2\,W_{\text{élas}}(\vv{u}^{\circ}) ,
+W(\vv{u} + h\,\vv{u}^{0}) - W(\vv{u})
+= h\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{0})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{0})\right] + h^2\,W_{\text{élas}}(\vv{u}^{0}) ,
 $$
 d'où
 $$
-\lim_{h\to 0}\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ}) + h\,W_{\text{élas}}(\vv{u}^{\circ})\right] = 0
+\lim_{h\to 0}\left[\int_\Omega \Cel : \eps(\vv{u}) : \eps(\vv{u}^{0})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{0}) + h\,W_{\text{élas}}(\vv{u}^{0})\right] = 0
 $$
 et finalement
 $$
-\int_\Omega \underbrace{\Cel : \eps(\vv{u})}_{\sig} : \eps(\vv{u}^{\circ})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0 .
+\int_\Omega \underbrace{\Cel : \eps(\vv{u})}_{\sig} : \eps(\vv{u}^{0})\,\mathrm{d}V - W_{\text{ext}}(\vv{u}^{0}) = 0, \qquad \forall\,\vv{u}^{0} \in \mathrm{CA}_0 .
 $$
 C'est le PTV : $\sig = \Cel : \eps(\vv{u})$ est SA, d'où l'équilibre.
 :::
