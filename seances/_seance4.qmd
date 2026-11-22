@@ -45,11 +45,11 @@ $$
 \end{aligned}
 \right.
 $$
-- **Cinématiquement admissible (CA).** Un champ de déplacement $\vv{u}^{\star}$ est dit CA si et seulement si
+- **Cinématiquement admissible (CA).** Un champ de déplacement $\vv{u}^{\star} \in \left[H^1(\Omega)\right]^3$ est dit CA si et seulement si
 $$
 \vv{u}^{\star} = \vv{u}_d \quad \text{sur } \partial\Omega_u .
 $$
-- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{\circ}$ est dit CA0 si et seulement si
+- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{\circ} \in \left[H^1(\Omega)\right]^3$ est dit CA0 si et seulement si
 $$
 \vv{u}^{\circ} = \vv{0} \quad \text{sur } \partial\Omega_u .
 $$
@@ -95,6 +95,17 @@ $$
 DW(\vv{u})(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
 $$
 où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{\circ}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle).
+- **PTV avec des champs virtuels quelconques et réactions d'appui.** Le principe des puissances virtuelles vu en MMC s'écrit avec des champs de vitesses virtuelles **quelconques** (comme ces champs sont arbitraires et que l'énoncé est linéaire **par rapport au champ virtuel**, on peut utiliser à l'envi des champs de vitesses ou de déplacements virtuels, et ainsi passer du principe des puissances virtuelles à celui des travaux virtuels). Le cours de MMC donne donc une version plus générale du PTV, où le champ virtuel $\hat{\vv{v}}$ est **quelconque**, sans condition sur $\partial\Omega_u$. Le travail des efforts extérieurs doit alors inclure celui des efforts de liaison exercés sur $\partial\Omega_u$, **inconnus**, de densité surfacique $\vv{R}$ (réactions d'appui) :
+  $$
+  \int_\Omega \sig : \eps(\hat{\vv{v}})\,\mathrm{d}V =
+  \int_\Omega \vv{f}_v\cdot\hat{\vv{v}}\,\mathrm{d}V +
+  \int_{\partial\Omega_f} \vv{f}_s\cdot\hat{\vv{v}}\,\mathrm{d}S +
+  \int_{\partial\Omega_u} \vv{R}\cdot\hat{\vv{v}}\,\mathrm{d}S,
+  \qquad \forall\,\hat{\vv{v}} \in \left[H^1(\Omega)\right]^3 .
+  $$
+  La démonstration du PTV (@sec-preuve-ptv) donne alors $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$ et $\sig\,\vv{n} = \vv{R}$ sur $\partial\Omega_u$ : la relation $\vv{R} = \sig\,\vv{n}$ est une **conséquence** du PTV général. Réciproquement, si l'on prend $\vv{R} = \sig\,\vv{n}$ pour acquis, se restreindre à $\vv{u}^{\circ} \in \mathrm{CA}_0$ ne fait perdre aucune information. Le terme en $\vv{R}$ disparaît, on résout le problème sans connaître les réactions, puis on les calcule **a posteriori** par $\vv{R} = \sig\,\vv{n}$. 
+
+  Faire travailler tous les efforts, y compris ceux de réaction ou d'interface (le PTV général), devient indispensable lorsque la condition locale n'est plus aussi intuitive que $\vv{R} = \sig\,\vv{n}$, par exemple pour une **interface dotée de sa propre énergie** (tension de surface, front de changement de phase, interface cohésive). Le PTV, complété du travail virtuel de l'interface, donne alors une condition de saut du type $[\![\sig]\!]\,\vv{n} + \dive_s\tsd{\sigma}_s = \vv{0}$ (loi de Young-Laplace généralisée, $\tsd{\sigma}_s$ étant la contrainte de surface), moins évidente à deviner que la simple continuité $[\![\sig]\!]\,\vv{n} = \vv{0}$.
 :::
 
 ::: {.callout-tip}
@@ -494,7 +505,7 @@ L'approximation de la solution est donc $\tilde{\vv{u}} = \alpha\,x_1 x_2\,\vv{e
 Dans cette section, $W$ n'est tracée que sur le sous-espace $\widetilde{\mathrm{CA}}$ de dimension 2 des champs $\vv{u}^{\star} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$, paramétré par $(\alpha, \beta)$. Le fond de la vallée est le minimum de $W$ **dans ce plan**, c'est-à-dire la solution approchée $\tilde{\vv{u}}$, et non le vrai minimum de $W$ sur l'espace CA de tous les déplacements admissibles, qui est la solution exacte $\vv{u}$. Comme $\widetilde{\mathrm{CA}} \subset \mathrm{CA}$, on a $W(\vv{u}) \leq W(\tilde{\vv{u}})$ : le vrai minimum est plus bas que le fond de cette vallée (@fig-ensembles-ca).
 :::
 
-L'énergie potentielle $W(\alpha, \beta)$ est une forme quadratique définie positive plus un terme linéaire : c'est un paraboloïde elliptique, dont le minimum est le couple $(\alpha, \beta)$ trouvé à la question 4. Dans les figures ci-dessous, $\alpha$ et $\beta$ sont rapportés à leurs valeurs optimales $\alpha_{\text{opt}}$ et $\beta_{\text{opt}}$, et $W$ à $|W_{\min}|$.
+L'énergie potentielle $W(\alpha, \beta)$ est une forme quadratique définie positive plus un terme linéaire : c'est un paraboloïde elliptique, dont le minimum est le couple $(\alpha, \beta)$ trouvé à la question 4. Comme $C_2 \gg C_1$ pour un bloc élancé, la vallée est très allongée : on se déplace presque sans coût énergétique le long de la direction $\alpha + 2\beta = \text{cste}$, celle où le cisaillement $\varepsilon_{12}$ ne change pas, c'est-à-dire, en variables réduites, presque le long de la diagonale $\alpha/\alpha_{\text{opt}} = \beta/\beta_{\text{opt}}$. Dans les figures ci-dessous, $\alpha$ et $\beta$ sont rapportés à leurs valeurs optimales $\alpha_{\text{opt}}$ et $\beta_{\text{opt}}$, et $W$ à $|W_{\min}|$.
 
 ```{python}
 #| label: param-bloc
@@ -575,7 +586,7 @@ fig.show()
 :::
 
 ::: {.content-visible when-format="html"}
-**Explorer le paysage énergétique.** Les curseurs font varier $\alpha$ et $\beta$ (rapportés à leurs valeurs optimales). À gauche, le point se déplace sur la surface $W(\alpha, \beta)$. À droite, on voit la déformée (amplifiée) du champ $\vv{u}^{\star} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$ correspondant. Seul le point $(\alpha_{\text{opt}}, \beta_{\text{opt}})$ réalise le minimum de $W$.
+**Explorer le paysage énergétique.** Les curseurs font varier $\alpha$ et $\beta$ (rapportés à leurs valeurs optimales). La surface n'est tracée que jusqu'à $W = 3\,|W_{\min}|$ (au-delà, le point reste affiché au sommet). À gauche, le point se déplace sur la surface $W(\alpha, \beta)$. À droite, on voit la déformée (amplifiée) du champ $\vv{u}^{\star} = \alpha\,x_1 x_2\,\vv{e}_1 + \beta\,x_1^2\,\vv{e}_2$ correspondant. Seul le point $(\alpha_{\text{opt}}, \beta_{\text{opt}})$ réalise le minimum de $W$.
 
 ```{python}
 #| label: explorateur-energie
