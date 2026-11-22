@@ -87,15 +87,8 @@ $$
 ::: {.callout-note}
 ### Remarques
 
-- Cette équation s'appelle le **principe des travaux virtuels**.
 - Puisqu'on s'intéresse au travail de variations $\vv{u}^{\circ} \in \mathrm{CA}_0$ (donc nulles sur $\partial\Omega_u$), le travail des efforts de réaction (inconnus) est nul : ces efforts n'apparaissent pas dans $W_{\text{ext}}$, seuls les efforts **connus** y apparaissent.
-- Les équations locales d'équilibre sont remplacées par une **formulation intégrale** (formulation variationnelle, ou **forme faible**). Plutôt que de vérifier l'équilibre en tout point, on impose la nullité du travail pour toute variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ de déplacement. Ceci se traduit par la stationnarité de l'énergie potentielle quand elle existe, mais le PTV reste valable qu'une telle énergie existe ou non.
-- Quand une énergie potentielle $W$ existe, l'équilibre s'écrit comme la **stationnarité** de $W$ dans toutes les directions admissibles $\vv{u}^{\circ}$ :
-$$
-DW(\vv{u})(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
-$$
-où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{\circ}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle).
-- Le principe des puissances virtuelles vu en MMC s'écrit avec des champs de vitesses virtuelles **quelconques** (comme ces champs sont arbitraires et que l'énoncé est linéaire **par rapport au champ virtuel**, on peut utiliser à l'envi des champs de vitesses ou de déplacements virtuels, et ainsi passer du principe des puissances virtuelles à celui des travaux virtuels). Le cours de MMC donne donc une version plus générale du PTV, où le champ virtuel $\hat{\vv{v}}$ est **quelconque**, sans condition sur $\partial\Omega_u$. Le travail des efforts extérieurs doit alors inclure celui des efforts de liaison exercés sur $\partial\Omega_u$, **inconnus**, de densité surfacique $\vv{R}$ (réactions d'appui) :
+- Le principe des puissances virtuelles vu en MMC s'écrit avec des champs de vitesses virtuelles **quelconques** (l'énoncé étant linéaire par rapport au champ virtuel, vitesses et déplacements virtuels sont interchangeables). Le cours de MMC donne donc une version plus générale du PTV, où le champ virtuel $\hat{\vv{v}}$ est **quelconque**, sans condition sur $\partial\Omega_u$. Le travail des efforts extérieurs doit alors inclure celui des réactions exercées sur $\partial\Omega_u$, **inconnues**, de densité surfacique $\vv{R}$ :
   $$
   \int_\Omega \sig : \eps(\hat{\vv{v}})\,\mathrm{d}V =
   \int_\Omega \vv{f}_v\cdot\hat{\vv{v}}\,\mathrm{d}V +
@@ -103,10 +96,17 @@ où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la dir
   \int_{\partial\Omega_u} \vv{R}\cdot\hat{\vv{v}}\,\mathrm{d}S,
   \qquad \forall\,\hat{\vv{v}} \in \left[H^1(\Omega)\right]^3 .
   $$
-  La démonstration du PTV (@sec-preuve-ptv) donne alors $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$ et $\sig\,\vv{n} = \vv{R}$ sur $\partial\Omega_u$ : la relation $\vv{R} = \sig\,\vv{n}$ est une **conséquence** du PTV général. Réciproquement, si l'on prend $\vv{R} = \sig\,\vv{n}$ pour acquis, se restreindre à $\vv{u}^{\circ} \in \mathrm{CA}_0$ ne fait perdre aucune information. Le terme en $\vv{R}$ disparaît, on résout le problème sans connaître les réactions, puis on les calcule **a posteriori** par $\vv{R} = \sig\,\vv{n}$. 
+  La démonstration du PTV (@sec-preuve-ptv) donne alors $\dive\sig + \vv{f}_v = \vv{0}$ dans $\Omega$, $\sig\,\vv{n} = \vv{f}_s$ sur $\partial\Omega_f$ et $\sig\,\vv{n} = \vv{R}$ sur $\partial\Omega_u$ : la relation $\vv{R} = \sig\,\vv{n}$ est une **conséquence** du PTV général. Réciproquement, si l'on prend $\vv{R} = \sig\,\vv{n}$ pour acquis, se restreindre à $\vv{u}^{\circ} \in \mathrm{CA}_0$ ne fait perdre aucune information. Le terme en $\vv{R}$ disparaît, on résout le problème sans connaître les réactions, puis on les calcule **a posteriori** par $\vv{R} = \sig\,\vv{n}$.
 
-  Faire travailler tous les efforts, y compris ceux de réaction ou d'interface (le PTV général), devient indispensable lorsque la condition locale n'est plus aussi intuitive que $\vv{R} = \sig\,\vv{n}$, par exemple pour une **interface dotée de sa propre énergie** (tension de surface, front de changement de phase, interface cohésive). 
+  Faire travailler tous les efforts, y compris ceux de réaction ou d'interface (le PTV général), devient indispensable lorsque la condition locale n'est plus aussi intuitive que $\vv{R} = \sig\,\vv{n}$, par exemple pour une **interface dotée de sa propre énergie** (tension de surface, front de changement de phase, interface cohésive), où c'est le PTV qui fournit la condition de saut à l'interface.
   <!-- Le PTV, complété du travail virtuel de l'interface, donne alors une condition de saut du type $[\![\sig]\!]\,\vv{n} + \dive_s\tsd{\sigma}_s = \vv{0}$ (loi de Young-Laplace généralisée, $\tsd{\sigma}_s$ étant la contrainte de surface), moins évidente à deviner que la simple continuité $[\![\sig]\!]\,\vv{n} = \vv{0}$. -->
+- Les équations locales d'équilibre sont remplacées par une **formulation intégrale** (formulation variationnelle, ou **forme faible**). Plutôt que de vérifier l'équilibre en tout point, on impose la nullité du travail virtuel total pour toute variation virtuelle $\vv{u}^{\circ} \in \mathrm{CA}_0$ de déplacement.
+- Le PTV ne fait intervenir **aucune loi de comportement** : l'équivalence « $\sig^{\star}$ SA $\Longleftrightarrow$ PTV » est de la pure statique, valable pour tout matériau, élastique ou non. Le comportement n'intervient que dans l'énergie potentielle $W$ (@sec-energie-potentielle), à travers $\Cel$.
+- Quand une énergie potentielle $W$ existe, l'équilibre s'écrit comme la **stationnarité** de $W$ dans toutes les directions admissibles $\vv{u}^{\circ}$ :
+$$
+DW(\vv{u})(\vv{u}^{\circ}) = 0, \qquad \forall\,\vv{u}^{\circ} \in \mathrm{CA}_0,
+$$
+où $DW(\vv{u})(\vv{u}^{\circ})$ est la dérivée de Gâteaux de $W$ dans la direction $\vv{u}^{\circ}$ (@sec-gateaux) : **c'est le PTV !** Avec de plus $\Cel$ défini positif, cette stationnarité est un **minimum** (cf. @sec-energie-potentielle). Le PTV reste toutefois valable qu'une telle énergie existe ou non.
 :::
 
 ::: {.callout-tip}
