@@ -19,3 +19,5 @@ body.quarto-dark .subtitle { color: #9ba2ff; }
 }
 /* Les encadrés passent toujours sous une figure flottante (pas de chevauchement) */
 .callout { clear: both; }
+/* Une figure flottante placée DANS un encadré reste contenue dans l'encadré */
+.callout-body-container, .callout-body { display: flow-root; }
