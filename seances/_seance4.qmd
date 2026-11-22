@@ -45,11 +45,11 @@ $$
 \end{aligned}
 \right.
 $$
-- **Cinématiquement admissible (CA).** Un champ de déplacement $\vv{u}^{\star} \in \left[H^1(\Omega)\right]^3$ est dit CA si et seulement si
+- **Cinématiquement admissible (CA).** Un champ de déplacement $\vv{u}^{\star} \in H^1(\Omega)^3$ est dit CA si et seulement si
 $$
 \vv{u}^{\star} = \vv{u}_d \quad \text{sur } \partial\Omega_u .
 $$
-- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{0} \in \left[H^1(\Omega)\right]^3$ est dit CA0 si et seulement si
+- **Cinématiquement admissible à zéro (CA0).** Un champ de déplacement $\vv{u}^{0} \in H^1(\Omega)^3$ est dit CA0 si et seulement si
 $$
 \vv{u}^{0} = \vv{0} \quad \text{sur } \partial\Omega_u .
 $$
