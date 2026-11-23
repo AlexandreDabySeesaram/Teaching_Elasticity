@@ -11,21 +11,7 @@ format:
     output-file: elasticite.pdf
 ---
 
-\newcommand{\vv}[1]{\underline{#1}}
-\newcommand{\tsd}[1]{\underline{\underline{#1}}}
-\newcommand{\tsq}[1]{\underline{\underline{\underline{\underline{#1}}}}}
-\newcommand{\Id}{\tsd{\mathbf{1}}}
-\newcommand{\eps}{\tsd{\varepsilon}}
-\newcommand{\sig}{\tsd{\sigma}}
-\newcommand{\Cel}{\tsq{C}}
-\newcommand{\Sel}{\tsq{S}}
-\newcommand{\tr}{\operatorname{tr}}
-\newcommand{\dive}{\operatorname{div}}
-\newcommand{\grad}{\operatorname{grad}}
-\newcommand{\T}{{}^{t}}
-\newcommand{\wel}{w_{\text{élas}}}
-\newcommand{\sigD}{\tsd{\sigma}^{D}}
-\newcommand{\svm}{\sigma_{\text{VM}}}
+{{< include _notations.qmd >}}
 
 ```{python}
 #| label: setup
